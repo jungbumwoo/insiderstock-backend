@@ -7,10 +7,10 @@ mongoose.connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASS
         useNewUrlParser: true, 
         useUnifiedTopology: true
     }
-)
+);
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error'));
 db.once('open', function() {
     console.log('✅ DB connected.')
-})
+});
