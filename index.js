@@ -42,6 +42,7 @@ puppeteer
                 } catch(err) {
                     console.log(err);
                 }
+                
                 scrapeItems.push({
                     postTitle: postTitle,
                     postDescription: postDescription
