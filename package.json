@@ -10,9 +10,7 @@
     "mongoose": "^5.11.19",
     "puppeteer": "^8.0.0"
   },
-  "devDependencies": {
-    "nodemon": "^2.0.7"
-  },
+  "devDependencies": {},
   "name": "backend",
   "version": "1.0.0",
   "main": "index.js",
