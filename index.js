@@ -33,32 +33,35 @@ puppeteer
         const trTag = '#wrapper > div > table > tbody > tr';
         await page.waitForSelector(trTag);
 
-        const extractText = async (_td) => {
-            const spanTd = await _td.querySelector('span');
-            if (spanTd) {
-                console.log(spanTd);
-            } else {
-                console.log("something wrong");
-            }
-            return ;
-        }
-
-        const isthere = await page.$eval(trTag, tds => tds.map(td => 
-            extractText(td)
-            ));
+        const isthere = await page.$$eval(trTag => {
+            console.log("trTag");
+            console.log(trTag);
+            let innerContents = [];
+            trTag.forEach(tr => {
+                let trBucket = {}; // []
+                tr.forEach(td => {
+                    let text;
+                    let tdBucket = {};
+                    let content = td.querySelector('span');
+                    if (content) {
+                        console.log("content");
+                        console.log(content);
+                        text = content.innerText;
+                    } else {
+                        text = "muyaho";
+                    }
+                    trBucket.push(tdBucket);
+                })
+            innerContents.push(trBucket);
+            })
+            return innerContents;
+        });
         console.log(isthere);
-        // const [response] = await Promise.all([
-        //     page.waitForNavigation(),
-        //     page.click(selector),
-        //     console.log(response)
-        // ]);
-
         await browser.close();
         // close Pop-up
         // const closePopupBtn = await page.$("el-dialog__headerbtn");
         // console.log("closePopupBtn");
         // console.log(closePopupBtn);
-
     })
 
 // puppeteer
