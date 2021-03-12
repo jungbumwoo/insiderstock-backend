@@ -33,28 +33,27 @@ puppeteer
         const trTag = '#wrapper > div > table > tbody > tr';
         await page.waitForSelector(trTag);
 
-        const isthere = await page.$$eval(trTag => {
-            console.log("trTag");
-            console.log(trTag);
-            let innerContents = [];
-            trTag.forEach(tr => {
-                let trBucket = {}; // []
-                tr.forEach(td => {
-                    let text;
-                    let tdBucket = {};
-                    let content = td.querySelector('span');
-                    if (content) {
-                        console.log("content");
-                        console.log(content);
-                        text = content.innerText;
-                    } else {
-                        text = "muyaho";
-                    }
-                    trBucket.push(tdBucket);
-                })
-            innerContents.push(trBucket);
-            })
-            return innerContents;
+        const isthere = await page.$eval(trTag, tr => {
+            console.log(tr);
+            // let innerContents = [];
+            // trTag.forEach(tr => {
+            //     let trBucket = {}; // []
+            //     tr.forEach(td => {
+            //         let text;
+            //         let tdBucket = {};
+            //         let content = td.querySelector('span');
+            //         if (content) {
+            //             console.log("content");
+            //             console.log(content);
+            //             text = content.innerText;
+            //         } else {
+            //             text = "muyaho";
+            //         }
+            //         trBucket.push(tdBucket);
+            //     })
+            // innerContents.push(trBucket);
+            // })
+            // return innerContents;
         });
         console.log(isthere);
         await browser.close();
