@@ -45,13 +45,14 @@ export const stock = (req, res) => {
             }
         );
         let nextpagelist = await nextpage(pageNum);
-        return res.status(200).json({ nextpagelist }); 
+        let finalList = await mainpage.concat(nextpagelist);
+        return res.status(200).json({ finalList }); 
     })
 }
 
 const nextpage = async (pageNumber, waitsecond = 500) => {
     let newpageNum = parseInt(pageNumber) + 1;
-    let newpageNumString = String(newpageNum);
+    // let newpageNumString = String(newpageNum);
     try {
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
@@ -59,10 +60,10 @@ const nextpage = async (pageNumber, waitsecond = 500) => {
 
         const trTag = '#wrapper > div > table > tbody > tr';
         await page.waitForSelector(trTag);
-        await page.evaluate((newpageNum) => {
-            console.log(newpageNum); //Why doesn't this work?
-            document.querySelector(`#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li:nth-child(${newpageNum})`).click()
-        });
+        await page.evaluate(x => {
+            console.log(x); //Why doesn't this work?
+            document.querySelector(`#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li:nth-child(${x})`).click()
+        }, newpageNum);
         await page.waitForTimeout(waitsecond);
         let isLoading = await page.$('nuxt-progress');
         if (!isLoading) {
