@@ -60,8 +60,8 @@ const nextpage = async (pageNumber, waitsecond = 500) => {
         const trTag = '#wrapper > div > table > tbody > tr';
         await page.waitForSelector(trTag);
         await page.evaluate((newpageNum) => {
-            console.log(newpageNum);
-            document.querySelector(`#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li:nth-child(2)`).click()
+            console.log(newpageNum); //Why doesn't this work?
+            document.querySelector(`#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li:nth-child(${newpageNum})`).click()
         });
         await page.waitForTimeout(waitsecond);
         let isLoading = await page.$('nuxt-progress');
@@ -84,6 +84,7 @@ const nextpage = async (pageNumber, waitsecond = 500) => {
             );
             return anotherPage;
         } else {
+            console.log('Loading now..');
             nextpage(pageNumber, waitsecond + 1000);
         }   
     } catch(error) {
