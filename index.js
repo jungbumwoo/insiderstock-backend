@@ -53,8 +53,6 @@ app.use('/api', stockRouter);
 //         console.log(grabPosts);
 //     })
 
-
-
 app.listen(PORT, () => {
     console.log(`✅ Listening on at http://localhost:${process.env.PORT}`);
 })
