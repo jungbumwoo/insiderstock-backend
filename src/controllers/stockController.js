@@ -35,14 +35,7 @@ export const stock = (req, res) => {
             return bucket;
             }
         );
-        
-        let nextpagelist = await nextpage(pageNum);
-        let finalList = await mainpage.concat(nextpagelist);
-
-        let today = getToday();
-        let pastDate = nextpagelist[nextpagelist.length -1][6];
-        let dateDiff = diffDate(today, pastDate);
-
+        let finalList = await loopPage(pageNum, mainpage);
         return res.status(200).json({ finalList });
     })
 }
@@ -111,3 +104,16 @@ const diffDate = (day1, day2) => {
     return diff;
 }
 
+const loopPage = async(pageNum, existList) => {
+    let nextpagelist = await nextpage(pageNum);
+    let addedList = await existList.concat(nextpagelist);
+
+    let today = getToday();
+    let pastDate = nextpagelist[nextpagelist.length -1][6];
+    let dateDiff = diffDate(today, pastDate);
+
+    if (dateDiff < 7) {
+        loopPage(pageNum + 1, addedList);
+    } 
+    return addedList;
+};
