@@ -28,15 +28,6 @@ export const stock = (req, res) => {
                     trTds.forEach(td => {
                         let text;
                         text = td.innerText;
-                        // let innerSpan = td.querySelector('span');
-                        // let innerDiv = td.querySelector('div');
-                        // if (innerSpan) {
-                        //     text = innerSpan.innerText;
-                        // } else if(innerDiv) {
-                        //     text = innerDiv.innerText;
-                        // } else {
-                        //     text = "muyaho"
-                        // }
                         trBucket.push(text);
                     })
                     bucket.push(trBucket);
@@ -44,9 +35,15 @@ export const stock = (req, res) => {
             return bucket;
             }
         );
+        
         let nextpagelist = await nextpage(pageNum);
         let finalList = await mainpage.concat(nextpagelist);
-        return res.status(200).json({ finalList }); 
+
+        let today = getToday();
+        let pastDate = nextpagelist[nextpagelist.length -1][6];
+        let dateDiff = diffDate(today, pastDate);
+
+        return res.status(200).json({ finalList });
     })
 }
 
@@ -91,5 +88,26 @@ const nextpage = async (pageNumber, waitsecond = 500) => {
     } catch(error) {
         console.log(error);
     }
+}
+
+const getToday = () => {
+    let timeNow = new Date();
+    let year = timeNow.getFullYear();
+    let month = ("0" + (1 + timeNow.getMonth())).slice(-2);
+    let day = ("0" + timeNow.getDate()).slice(-2);
+    
+    return year + '-' + month + '-' + day;
+}
+
+const diffDate = (day1, day2) => {
+    let strDay1 = day1.split('-');
+    let strDay2 = day2.split('-');
+    
+    let date1 = new Date(strDay1[0], strDay1[1] -1, strDay1[2]);
+    let date2 = new Date(strDay2[0], strDay2[1] -1, strDay2[2]);
+
+    let diff = (date1 - date2) / (1000*60*60*24); 
+    console.log(diff);
+    return diff;
 }
 
