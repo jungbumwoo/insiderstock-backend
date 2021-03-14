@@ -35,7 +35,8 @@ export const stock = (req, res) => {
             return bucket;
             }
         );
-        let finalList = await loopPage(pageNum, mainpage);
+        let pageNumInt = parseInt(pageNum);
+        let finalList = loopPage(pageNumInt, mainpage);
         return res.status(200).json({ finalList });
     })
 }
@@ -57,9 +58,11 @@ const nextpage = async (pageNumber, waitsecond = 500) => {
         await page.waitForTimeout(waitsecond);
         let isLoading = await page.$('nuxt-progress');
         if (!isLoading) {
+            console.log(`nextpage Function excuted with pageNumber ${newpageNum}`);
             const anotherPage = await page.$$eval(trTag, trs => {
                 let bucket = [];
                 trs.forEach(tr => {
+                        console.log(tr);
                         let trTds = tr.querySelectorAll('td');
                         let trBucket = [];
                         trTds.forEach(td => {
@@ -69,7 +72,6 @@ const nextpage = async (pageNumber, waitsecond = 500) => {
                         })
                         bucket.push(trBucket);
                     })
-                console.log(bucket);
                 return bucket; 
                 }
             );
@@ -77,7 +79,7 @@ const nextpage = async (pageNumber, waitsecond = 500) => {
         } else {
             console.log('Loading now..');
             nextpage(pageNumber, waitsecond + 1000);
-        }   
+        }  
     } catch(error) {
         console.log(error);
     }
@@ -100,11 +102,11 @@ const diffDate = (day1, day2) => {
     let date2 = new Date(strDay2[0], strDay2[1] -1, strDay2[2]);
 
     let diff = (date1 - date2) / (1000*60*60*24); 
-    console.log(diff);
     return diff;
 }
 
 const loopPage = async(pageNum, existList) => {
+    console.log(`loopPage with pageNum: ${pageNum}`);
     let nextpagelist = await nextpage(pageNum);
     let addedList = await existList.concat(nextpagelist);
 
@@ -112,8 +114,11 @@ const loopPage = async(pageNum, existList) => {
     let pastDate = nextpagelist[nextpagelist.length -1][6];
     let dateDiff = diffDate(today, pastDate);
 
-    if (dateDiff < 7) {
+    if (pageNum < 2) {
         loopPage(pageNum + 1, addedList);
-    } 
-    return addedList;
+    } else {
+        console.log("addedList")
+        console.log(addedList);
+        return addedList;
+    }
 };
