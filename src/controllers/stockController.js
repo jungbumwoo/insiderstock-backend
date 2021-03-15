@@ -40,48 +40,52 @@ import puppeteer from "puppeteer";
 //     })
 // }
 
-export const stock = async(req, res) => {
-    try {
-        const browser = await puppeteer.launch();
-        const page = await browser.newPage();
-        await page.goto('https://www.gurufocus.com/insider/summary');
-
-        const selector = 'body > div.el-dialog__wrapper > div > div.el-dialog__header > button';
-        await page.waitForSelector(selector);
-        await page.click(selector);
-
-        const trTag = '#wrapper > div > table > tbody > tr';
-        const activePageTag = '#components-root > div > div.insider-page > div:nth-child(9) > div > ul > li.number.active';
-        await page.waitForSelector(trTag);
-
-        let pageNum = await page.$eval(activePageTag, num => num.innerText);
-        const mainpage = await page.$$eval(trTag, trs => {
-            let bucket = [];
-            trs.forEach(tr => {
-                    // bucket.push(tr.innerHTML);
-                    let trTds = tr.querySelectorAll('td');
-                    let trBucket = [];
-                    trTds.forEach(td => {
-                        let text;
-                        text = td.innerText;
-                        trBucket.push(text);
+export const stock = (req, res) => {
+    (async () => {
+        try {
+            console.log("stock func executed");
+            const browser = await puppeteer.launch();
+            const page = await browser.newPage();
+            await page.goto('https://www.gurufocus.com/insider/summary');
+    
+            const selector = 'body > div.el-dialog__wrapper > div > div.el-dialog__header > button';
+            await page.waitForSelector(selector);
+            await page.click(selector);
+    
+            const trTag = '#wrapper > div > table > tbody > tr';
+            const activePageTag = '#components-root > div > div.insider-page > div:nth-child(9) > div > ul > li.number.active';
+            await page.waitForSelector(trTag);
+    
+            let pageNum = await page.$eval(activePageTag, num => num.innerText);
+            const mainpage = await page.$$eval(trTag, trs => {
+                let bucket = [];
+                trs.forEach(tr => {
+                        // bucket.push(tr.innerHTML);
+                        let trTds = tr.querySelectorAll('td');
+                        let trBucket = [];
+                        trTds.forEach(td => {
+                            let text;
+                            text = td.innerText;
+                            trBucket.push(text);
+                        })
+                        bucket.push(trBucket);
                     })
-                    bucket.push(trBucket);
-                })
-                return bucket;
-            }
-        );
-        let pageNumInt = parseInt(pageNum);
-        let finalresult = await loopPage(pageNumInt, mainpage);
-        return res.status(200).json({finalresult});
-    } catch(err) {
-        console.log(err)
-    }
+                    return bucket;
+                }
+            );
+            let pageNumInt = parseInt(pageNum);
+            let finalresult = loopPage(pageNumInt, mainpage);
+            console.log(finalresult);
+            return res.status(200).json({ finalresult });
+        } catch(err) {
+            console.log(err)
+        }
+    })();
 }
 
 
-const nextpage = async (pageNumber, waitsecond = 3000) => {
-    let newpageNum = pageNumber + 1;
+const nextpage = async (pageNumber, waitsecond = 5000) => {
+    let newpageNum = pageNumber + 1
     let changedUrl = `#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li:nth-child(${newpageNum})`
     // let newpageNumString = String(newpageNum);
     try {
@@ -116,7 +120,7 @@ const nextpage = async (pageNumber, waitsecond = 3000) => {
                 return bucket; 
                 }
             );
-            console.log(anotherPage[0][0]);
+            console.log(anotherPage[anotherPage.length - 1][0]);
             return anotherPage;
         } else {
             console.log('Loading now..');
@@ -152,17 +156,18 @@ const loopPage = async (pageNum, existList) => {
         console.log(`loopPage with pageNum: ${pageNum}`);
         if (pageNum == 5) {
             console.log('loop will end');
-            // return existList;
+            let finalLoopPageList = existList;
+            console.log(finalLoopPageList[finalLoopPageList.length -1][0]);
+            return finalLoopPageList;
         } else {
             let nextpagelist = await nextpage(pageNum);
             let addedList = await existList.concat(nextpagelist);
             let today = getToday();
-            let pastDate = nextpagelist[nextpagelist.length -1][6];
-            let dateDiff = diffDate(today, pastDate);
+            // let pastDate = nextpagelist[nextpagelist.length -1][6];
+            // let dateDiff = diffDate(today, pastDate);
             console.log('loopPage will excute again');
             await loopPage(pageNum + 1, addedList);
         }
-        return existList;
     } catch(error) {
         console.log(error);
     }
