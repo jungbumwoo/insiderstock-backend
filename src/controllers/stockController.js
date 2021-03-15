@@ -3,10 +3,47 @@ import puppeteer from "puppeteer";
 // 첫 페이지 뜨는 거 읽은 다음에 다음 페이지는 상황을 봐가며 읽던가 멈추던가 하는 방법이 있고
 // 아에 처음부터 페이지를 돌리는데 상황을 보고 멈추는 방법도 있고.
 
-export const stock = (req, res) => {
-    puppeteer
-    .launch()
-    .then(async browser => {
+// export const stock = (req, res) => {
+//     puppeteer
+//     .launch()
+//     .then(async browser => {
+//         const page = await browser.newPage();
+//         await page.goto('https://www.gurufocus.com/insider/summary');
+
+//         const selector = 'body > div.el-dialog__wrapper > div > div.el-dialog__header > button';
+//         await page.waitForSelector(selector);
+//         await page.click(selector);
+
+//         const trTag = '#wrapper > div > table > tbody > tr';
+//         const activePageTag = '#components-root > div > div.insider-page > div:nth-child(9) > div > ul > li.number.active';
+//         await page.waitForSelector(trTag);
+
+//         let pageNum = await page.$eval(activePageTag, num => num.innerText);
+//         const mainpage = await page.$$eval(trTag, trs => {
+//             let bucket = [];
+//             trs.forEach(tr => {
+//                     // bucket.push(tr.innerHTML);
+//                     let trTds = tr.querySelectorAll('td');
+//                     let trBucket = [];
+//                     trTds.forEach(td => {
+//                         let text;
+//                         text = td.innerText;
+//                         trBucket.push(text);
+//                     })
+//                     bucket.push(trBucket);
+//                 })
+//             return bucket;
+//             }
+//         );
+//         let pageNumInt = parseInt(pageNum);
+//         let finalList = await loopPage(pageNumInt, mainpage);
+//         return res.status(200).json({ finalList });
+//     })
+// }
+
+export const stock = async(req, res) => {
+    try {
+        const browser = await puppeteer.launch();
         const page = await browser.newPage();
         await page.goto('https://www.gurufocus.com/insider/summary');
 
@@ -32,17 +69,21 @@ export const stock = (req, res) => {
                     })
                     bucket.push(trBucket);
                 })
-            return bucket;
+                return bucket;
             }
         );
         let pageNumInt = parseInt(pageNum);
-        let finalList = loopPage(pageNumInt, mainpage);
-        return res.status(200).json({ finalList });
-    })
+        let finalresult = await loopPage(pageNumInt, mainpage);
+        console.log(finalresult)
+        return res.status(200).json({finalresult});
+    } catch(err) {
+        console.log(err)
+    }
 }
 
+
 const nextpage = async (pageNumber, waitsecond = 500) => {
-    let newpageNum = parseInt(pageNumber) + 1;
+    let newpageNum = pageNumber + 1;
     // let newpageNumString = String(newpageNum);
     try {
         const browser = await puppeteer.launch();
@@ -105,20 +146,21 @@ const diffDate = (day1, day2) => {
     return diff;
 }
 
-const loopPage = async(pageNum, existList) => {
+const loopPage = async (pageNum, existList) => {
     console.log(`loopPage with pageNum: ${pageNum}`);
     let nextpagelist = await nextpage(pageNum);
-    let addedList = await existList.concat(nextpagelist);
+    console.log(nextpagelist[nextpagelist.length -1]);
+    let addedList = existList.concat(nextpagelist);
 
     let today = getToday();
     let pastDate = nextpagelist[nextpagelist.length -1][6];
     let dateDiff = diffDate(today, pastDate);
 
-    if (pageNum < 2) {
-        loopPage(pageNum + 1, addedList);
-    } else {
-        console.log("addedList")
-        console.log(addedList);
+    if (pageNum == 3) {
+        console.log('loop will end');
         return addedList;
+    } else {
+        console.log('loopPage will excute again');
+        loopPage(pageNum + 1, addedList);
     }
 };
