@@ -1,5 +1,4 @@
 import puppeteer from "puppeteer";
-
 // 첫 페이지 뜨는 거 읽은 다음에 다음 페이지는 상황을 봐가며 읽던가 멈추던가 하는 방법이 있고
 // 아에 처음부터 페이지를 돌리는데 상황을 보고 멈추는 방법도 있고.
 
@@ -74,7 +73,6 @@ export const stock = async(req, res) => {
         );
         let pageNumInt = parseInt(pageNum);
         let finalresult = await loopPage(pageNumInt, mainpage);
-        console.log(finalresult)
         return res.status(200).json({finalresult});
     } catch(err) {
         console.log(err)
@@ -82,8 +80,9 @@ export const stock = async(req, res) => {
 }
 
 
-const nextpage = async (pageNumber, waitsecond = 500) => {
+const nextpage = async (pageNumber, waitsecond = 3000) => {
     let newpageNum = pageNumber + 1;
+    let changedUrl = `#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li:nth-child(${newpageNum})`
     // let newpageNumString = String(newpageNum);
     try {
         const browser = await puppeteer.launch();
@@ -92,10 +91,11 @@ const nextpage = async (pageNumber, waitsecond = 500) => {
 
         const trTag = '#wrapper > div > table > tbody > tr';
         await page.waitForSelector(trTag);
-        await page.evaluate(x => {
-            console.log(x); //Why doesn't this work?
-            document.querySelector(`#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li:nth-child(${x})`).click()
-        }, newpageNum);
+        // await page.evaluate(x => {
+        //     // console.log(x); //Why doesn't this work?
+        //     document.querySelector(`#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li:nth-child(${x})`).click()
+        // }, newpageNum);
+        await page.$eval(changedUrl, li => li.click());
         await page.waitForTimeout(waitsecond);
         let isLoading = await page.$('nuxt-progress');
         if (!isLoading) {
@@ -103,7 +103,7 @@ const nextpage = async (pageNumber, waitsecond = 500) => {
             const anotherPage = await page.$$eval(trTag, trs => {
                 let bucket = [];
                 trs.forEach(tr => {
-                        console.log(tr);
+                        console.log(tr); // 이 줄은 왜 실행안됨????
                         let trTds = tr.querySelectorAll('td');
                         let trBucket = [];
                         trTds.forEach(td => {
@@ -116,6 +116,7 @@ const nextpage = async (pageNumber, waitsecond = 500) => {
                 return bucket; 
                 }
             );
+            console.log(anotherPage[0][0]);
             return anotherPage;
         } else {
             console.log('Loading now..');
@@ -147,20 +148,22 @@ const diffDate = (day1, day2) => {
 }
 
 const loopPage = async (pageNum, existList) => {
-    console.log(`loopPage with pageNum: ${pageNum}`);
-    let nextpagelist = await nextpage(pageNum);
-    console.log(nextpagelist[nextpagelist.length -1]);
-    let addedList = existList.concat(nextpagelist);
-
-    let today = getToday();
-    let pastDate = nextpagelist[nextpagelist.length -1][6];
-    let dateDiff = diffDate(today, pastDate);
-
-    if (pageNum == 3) {
-        console.log('loop will end');
-        return addedList;
-    } else {
-        console.log('loopPage will excute again');
-        loopPage(pageNum + 1, addedList);
+    try {
+        console.log(`loopPage with pageNum: ${pageNum}`);
+        if (pageNum == 5) {
+            console.log('loop will end');
+            // return existList;
+        } else {
+            let nextpagelist = await nextpage(pageNum);
+            let addedList = await existList.concat(nextpagelist);
+            let today = getToday();
+            let pastDate = nextpagelist[nextpagelist.length -1][6];
+            let dateDiff = diffDate(today, pastDate);
+            console.log('loopPage will excute again');
+            await loopPage(pageNum + 1, addedList);
+        }
+        return existList;
+    } catch(error) {
+        console.log(error);
     }
 };
