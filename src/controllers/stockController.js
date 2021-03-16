@@ -75,7 +75,7 @@ export const stock = (req, res) => {
             );
             let pageNumInt = parseInt(pageNum);
             let finalresult = await loopPage(pageNumInt, mainpage);
-            console.log(finalresult);
+            console.log(finalresult[finalresult.length -1][0]);
             return res.status(200).json({ finalresult });
         } catch(err) {
             console.log(err)
@@ -165,13 +165,12 @@ const loopPage = async (pageNum, existList) => {
             return finalLoopPageList;
         } else {
             let nextpagelist = await nextpage(pageNum);
-            let addedList = await existList.concat(nextpagelist);
+            let addedList = existList.concat(nextpagelist);
             let today = getToday();
             // let pastDate = nextpagelist[nextpagelist.length -1][6];
             // let dateDiff = diffDate(today, pastDate);
             console.log('loopPage will excute again');
-            return addedList;
-            await loopPage(pageNum + 1, addedList);
+            return await loopPage(pageNum + 1, addedList);
         }
     } catch(error) {
         console.log(error);
