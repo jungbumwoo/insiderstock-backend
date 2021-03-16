@@ -74,13 +74,17 @@ export const stock = (req, res) => {
                 }
             );
             let pageNumInt = parseInt(pageNum);
-            let finalresult = loopPage(pageNumInt, mainpage);
+            let finalresult = await loopPage(pageNumInt, mainpage);
             console.log(finalresult);
             return res.status(200).json({ finalresult });
         } catch(err) {
             console.log(err)
         }
     })();
+    // .then(final => {
+    //     console.log(final);
+    //     return res.status(200).json({ final });
+    // })
 }
 
 
@@ -166,6 +170,7 @@ const loopPage = async (pageNum, existList) => {
             // let pastDate = nextpagelist[nextpagelist.length -1][6];
             // let dateDiff = diffDate(today, pastDate);
             console.log('loopPage will excute again');
+            return addedList;
             await loopPage(pageNum + 1, addedList);
         }
     } catch(error) {
