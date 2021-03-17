@@ -1,4 +1,5 @@
 import express, { response } from "express";
+import cors from "cors";
 import dotenv from "dotenv";
 
 //router
@@ -12,6 +13,8 @@ const PORT = process.env.PORT;
 
 express.json();
 
+
+app.use(cors());
 app.use('/api', stockRouter);
 //https://hackernoon.com/a-guide-to-web-scraping-with-javascript-and-nodejs-i21l3te1
 
