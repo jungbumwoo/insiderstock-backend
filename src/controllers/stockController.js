@@ -158,7 +158,7 @@ const diffDate = (day1, day2) => {
 const loopPage = async (pageNum, existList) => {
     try {
         console.log(`loopPage with pageNum: ${pageNum}`);
-        if (pageNum == 5) {
+        if (pageNum == 2) {
             console.log('loop will end');
             let finalLoopPageList = existList;
             console.log(finalLoopPageList[finalLoopPageList.length -1][0]);
