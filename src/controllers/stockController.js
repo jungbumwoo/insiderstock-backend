@@ -40,7 +40,7 @@ import puppeteer from "puppeteer";
 //     })
 // }
 
-export const stock = (req, res) => {
+export const getAllStock = (req, res) => {
     (async () => {
         try {
             console.log("stock func executed");
