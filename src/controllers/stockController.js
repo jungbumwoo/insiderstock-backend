@@ -9,15 +9,15 @@ export const getAllStock = (req, res) => {
             const browser = await puppeteer.launch();
             const page = await browser.newPage();
             await page.goto('https://www.gurufocus.com/insider/summary');
-    
+            
             const selector = 'body > div.el-dialog__wrapper > div > div.el-dialog__header > button';
             await page.waitForSelector(selector);
             await page.click(selector);
-    
+            
             const trTag = '#wrapper > div > table > tbody > tr';
             const activePageTag = '#components-root > div > div.insider-page > div:nth-child(9) > div > ul > li.number.active';
             await page.waitForSelector(trTag);
-    
+            
             let pageNum = await page.$eval(activePageTag, num => num.innerText);
             const mainpage = await page.$$eval(trTag, trs => {
                 let bucket = [];
@@ -36,8 +36,10 @@ export const getAllStock = (req, res) => {
                 }
             );
             let pageNumInt = parseInt(pageNum);
-            let finalresult = await loopPage(pageNumInt, mainpage);
+            let finalresult = await loopPage(pageNumInt, mainpage, page);
             let buyresult = buyfilter(finalresult);
+
+            await browser.close();
             return res.status(200).json({ buyresult });
         } catch(err) {
             console.log(err)
@@ -50,14 +52,14 @@ export const getAllStock = (req, res) => {
 }
 
 
-const nextpage = async (pageNumber, waitsecond = 5000) => {
+const nextpage = async (pageNumber, waitsecond = 5000, page) => {
     let newpageNum = pageNumber + 1
     let changedUrl = `#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li:nth-child(${newpageNum})`
     // let newpageNumString = String(newpageNum);
     try {
-        const browser = await puppeteer.launch();
-        const page = await browser.newPage();
-        await page.goto('https://www.gurufocus.com/insider/summary');
+        // const browser = await puppeteer.launch();
+        // const page = await browser.newPage();
+        // await page.goto('https://www.gurufocus.com/insider/summary');
 
         const trTag = '#wrapper > div > table > tbody > tr';
         await page.waitForSelector(trTag);
@@ -90,7 +92,7 @@ const nextpage = async (pageNumber, waitsecond = 5000) => {
             return anotherPage;
         } else {
             console.log('Loading now..');
-            nextpage(pageNumber, waitsecond + 1000);
+            nextpage(pageNumber, waitsecond + 1000, page);
         }  
     } catch(error) {
         console.log(error);
@@ -117,7 +119,7 @@ const diffDate = (day1, day2) => {
     return diff;
 }
 
-const loopPage = async (pageNum, existList) => {
+const loopPage = async (pageNum, existList, page) => {
     try {
         console.log(`loopPage with pageNum: ${pageNum}`);
         if (pageNum == 2) {
@@ -126,7 +128,7 @@ const loopPage = async (pageNum, existList) => {
             console.log(finalLoopPageList[finalLoopPageList.length -1][0]);
             return finalLoopPageList;
         } else {
-            let nextpagelist = await nextpage(pageNum);
+            let nextpagelist = await nextpage(pageNum, 5000, page);
             let addedList = existList.concat(nextpagelist);
             let today = getToday();
             // let pastDate = nextpagelist[nextpagelist.length -1][6];
