@@ -1,7 +1,9 @@
 import express from "express";
-import { stock } from "../controllers/stockController";
+import { getAllStock, saveStock } from "../controllers/stockController";
 const router = express.Router();
 
-router.get('/stock', stock);
+router.get('/stock', getAllStock);
+
+router.post('/savestock', saveStock);
 
 export default router;
