@@ -1,3 +1,4 @@
+import Stock from "../models/Stock.js";
 import puppeteer from "puppeteer";
 // 첫 페이지 뜨는 거 읽은 다음에 다음 페이지는 상황을 봐가며 읽던가 멈추던가 하는 방법이 있고
 // 아에 처음부터 페이지를 돌리는데 상황을 보고 멈추는 방법도 있고.
@@ -147,8 +148,19 @@ const buyfilter = (list) => {
 }
 
 export const saveStock = (req, res) => {
-    console.log(req);
+    const { data } = req.body;
+    console.log(data);
     console.log("saveStock at backend");
+    let newTypeData = data.reduce((acc, item) => {
+        acc.push({
+            ticker: item[0],
+            company: item[2],
+            price: item[3]
+        })
+        return acc
+    }, []);
+    console.log(newTypeData)
+
     let savedList = "muyaho";
     return res.status(200).json({ savedList });
-}
+};
