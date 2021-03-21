@@ -147,5 +147,8 @@ const buyfilter = (list) => {
 }
 
 export const saveStock = (req, res) => {
-    
+    console.log(req);
+    console.log("saveStock at backend");
+    let savedList = "muyaho";
+    return res.status(200).json({ savedList });
 }
