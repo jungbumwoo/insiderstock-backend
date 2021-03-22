@@ -147,7 +147,7 @@ const buyfilter = (list) => {
     return result
 }
 
-export const saveStock = (req, res) => {
+export const saveStock = async(req, res) => {
     const { data } = req.body;
     console.log(data);
     console.log("saveStock at backend");
@@ -155,12 +155,26 @@ export const saveStock = (req, res) => {
         acc.push({
             ticker: item[0],
             company: item[2],
-            price: item[3]
+            currentprice: parseFloat(item[3].replace(/\$/g, '')),
+            insiderName: item[4],
+            insiderPosition: item[5],
+            date: item[6],
+            buyOrSell: item[7],
+            insiderTradingShares: parseFloat(item[8].replace(/\,/, '')),
+            sharesChange: parseFloat(item[9].replace(/\%/g, '')),
+            purchasePrice: parseFloat(item[10].replace(/\$/g, '')),
+            cost: parseFloat(item[11].replace(/\$|\,/g, '')),
+            finalShare: item[12].replace(/\,/, ''),
+            priceChangeSIT: item[13].replace(/\%/, ''),
+            DividendYield: item[14],
+            PERatio: item[15],
+            MarketCap: item[16]
         })
         return acc
     }, []);
-    console.log(newTypeData)
-
+    console.log(newTypeData);
+    let result = await Stock.create(newTypeData);
+    console.log(result);
     let savedList = "muyaho";
     return res.status(200).json({ savedList });
 };
