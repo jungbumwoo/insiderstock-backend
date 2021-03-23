@@ -164,17 +164,25 @@ export const saveStock = async(req, res) => {
             sharesChange: parseFloat(item[9].replace(/\%/g, '')),
             purchasePrice: parseFloat(item[10].replace(/\$/g, '')),
             cost: parseFloat(item[11].replace(/\$|\,/g, '')),
-            finalShare: item[12].replace(/\,/, ''),
-            priceChangeSIT: item[13].replace(/\%/, ''),
-            DividendYield: item[14],
-            PERatio: item[15],
-            MarketCap: item[16]
+            finalShare: parseInt(item[12].replace(/\,/g, '')),
+            priceChangeSIT: parseFloat(item[13].replace(/\%/, '')),
+            DividendYield: parseFloat(item[14]),
+            PERatio: parseFloat(item[15]),
+            MarketCap: parseFloat(item[16])
         })
         return acc
     }, []);
     console.log(newTypeData);
     let result = await Stock.create(newTypeData);
     console.log(result);
-    let savedList = "muyaho";
+    let savedList = result.map((item) => {
+        return { ticker : item.ticker, 
+                company: item.company}
+    })
+    console.log(savedList);
     return res.status(200).json({ savedList });
 };
+
+export const getOwnedStock = (req, res) => {
+    
+}
