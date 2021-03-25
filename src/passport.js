@@ -1,12 +1,16 @@
 import passport from "passport";
 import FacebookStrategy from "passport-facebook";
+import User from "./models/User.js";
 
-passport.serializeUser(function(user, cb) {
-    cb(null, user);
+passport.serializeUser(function(info, cb) {
+    console.log("serializeUser is executed");
+    console.log(info);
+    cb(null, info);
 })
 
-passport.deserializeUser(function(obj, cb) {
-    cb(null, obj);
+passport.deserializeUser(function(info, cb) {
+    console.log("deserializeUser is executed");
+    cb(null, info);
 })
 
 passport.use(new FacebookStrategy({
@@ -15,22 +19,32 @@ passport.use(new FacebookStrategy({
     callbackURL: process.env.FACEBOOK_CALLBACK_URL
     },
     function(accessToken, refreshToken, profile, done) {
-        console.log(profile);
-        User.findOne({ email }, async function(err, user) {
+        const { name, id } = profile._json;
+        User.findOne({ id }, async function(err, user) {
             if (err) { return done(err); }
             if (user) {
-                done(null, user);
+                console.log("user is exsist");
+                console.log(user);
+                let info = {
+                    user,
+                    accessToken
+                }
+                done(null, info);
             } else {
                 user = new User({
-                    facebook_id: profile.id,
-                    name: profile.displayName
+                    id: id,
+                    name: name
                 });
                 user.save(function(err) {
                     if(err){
                         console.log(err);
                     } else {
                         console.log("saving user..");
-                        done(null, user);
+                        let info = {
+                            user,
+                            accessToken
+                        }
+                        done(null, info);
                     }
                 })
             }
