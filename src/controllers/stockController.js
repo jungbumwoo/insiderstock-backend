@@ -149,8 +149,8 @@ const buyfilter = (list) => {
 
 export const saveStock = async(req, res) => {
     const { data } = req.body;
-    console.log(data);
-    console.log("saveStock at backend");
+    console.log("saveStock at backend, req!");
+    console.log(req);
     let newTypeData = data.reduce((acc, item) => {
         acc.push({
             ticker: item[0],
@@ -172,14 +172,11 @@ export const saveStock = async(req, res) => {
         })
         return acc
     }, []);
-    console.log(newTypeData);
     let result = await Stock.create(newTypeData);
-    console.log(result);
     let savedList = result.map((item) => {
         return { ticker : item.ticker, 
                 company: item.company}
     })
-    console.log(savedList);
     return res.status(200).json({ savedList });
 };
 

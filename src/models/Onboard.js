@@ -1,16 +1,16 @@
 import mongoose from "mongoose";
 
-const stockSchema = new mongoose.Schema({
+const onboardSchema = new mongoose.Schema({
     ticker: String,
     company: String,
     currentprice: String,
+    purchasePrice: String,
     insiderName: String,
     insiderPosition: String,
     date: { type: Date },
     buyOrSell: String,
     insiderTradingShares: String,
     sharesChange: String,
-    purchasePrice: String,
     cost: mongoose.Schema.Types.Decimal128,
     finalShare: Number,
     // price change since insider trade
@@ -23,6 +23,6 @@ const stockSchema = new mongoose.Schema({
     myprice: mongoose.Schema.Types.Decimal128
 });
 
-const model = mongoose.model('Stock', stockSchema);
+const model = mongoose.model('Onboard', onboardSchema);
 
 export default model;
