@@ -2,6 +2,10 @@ export const getLogin = (req, res) => {
     console.log("getLogin");
 }
 
+export const getUser = (req, res) => {
+    
+}
+
 export const postLogin = (req, res) => {
     console.log("postLogin");
 }
@@ -11,8 +15,9 @@ export const postLogin = (req, res) => {
 export const getToken = (req, res, next) => {
     if(true) {
         // signin
-        const { accessToken } = req.session.passport.user;
-        console.log(accessToken);
+        const { accessToken, user } = req.session.passport.user;
+        console.log(user.name);
+        res.cookie('userName', user.name, { expiresIn: '1d'});
         return res.redirect(`http://localhost:3000/${accessToken}/#`)
 
     } else {
