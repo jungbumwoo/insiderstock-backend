@@ -18,7 +18,8 @@ export const getToken = (req, res, next) => {
         const { accessToken, user } = req.session.passport.user;
         console.log(user.name);
         res.cookie('userName', user.name, { expiresIn: '1d'});
-        return res.redirect(`http://localhost:3000/${accessToken}/#`)
+        // res.clearCookie('token');
+        return res.redirect(`http://localhost:3000/${accessToken}/#`);
 
     } else {
         //signup
