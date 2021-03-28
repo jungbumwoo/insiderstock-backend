@@ -19,6 +19,7 @@ const onboardSchema = new mongoose.Schema({
     PERatio: mongoose.Schema.Types.Decimal128,
     MarketCap: mongoose.Schema.Types.Decimal128,
 
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
     mydate: { type: Date },
     myprice: mongoose.Schema.Types.Decimal128
 });

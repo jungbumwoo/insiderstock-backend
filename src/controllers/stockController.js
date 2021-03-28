@@ -183,3 +183,11 @@ export const saveStock = async(req, res) => {
 export const getOwnedStock = (req, res) => {
     
 }
+
+export const addOnboard = (req, res) => {
+    console.log(req.body.data);
+}
+
+export const addInterest = (req, res) => {
+    console.log(req.body.data);
+}
