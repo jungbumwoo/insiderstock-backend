@@ -11,14 +11,17 @@ export const getAllStock = (req, res) => {
             const page = await browser.newPage();
             await page.goto('https://www.gurufocus.com/insider/summary');
             
+            // waitFor login Request and close(click) the request requirement
             const selector = 'body > div.el-dialog__wrapper > div > div.el-dialog__header > button';
             await page.waitForSelector(selector);
             await page.click(selector);
-            
+
+            // data
             const trTag = '#wrapper > div > table > tbody > tr';
-            const activePageTag = '#components-root > div > div.insider-page > div:nth-child(9) > div > ul > li.number.active';
             await page.waitForSelector(trTag);
-            
+
+            //pageNum
+            const activePageTag = '#components-root > div > div.insider-page > div:nth-child(9) > div > ul > li.number.active';
             let pageNum = await page.$eval(activePageTag, num => num.innerText);
             const mainpage = await page.$$eval(trTag, trs => {
                 let bucket = [];
@@ -36,8 +39,11 @@ export const getAllStock = (req, res) => {
                     return bucket;
                 }
             );
+            //approach to next pages
             let pageNumInt = parseInt(pageNum);
             let finalresult = await loopPage(pageNumInt, mainpage, page);
+
+            //only get "buy" data
             let buyresult = buyfilter(finalresult);
 
             await browser.close();
@@ -53,7 +59,7 @@ export const getAllStock = (req, res) => {
 }
 
 
-const nextpage = async (pageNumber, waitsecond = 5000, page) => {
+const nextpage = async (pageNumber, waitsecond = 50000, page) => {
     let newpageNum = pageNumber + 1
     let changedUrl = `#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li:nth-child(${newpageNum})`
     // let newpageNumString = String(newpageNum);
@@ -79,7 +85,7 @@ const nextpage = async (pageNumber, waitsecond = 5000, page) => {
                         console.log(tr); // 이 줄은 왜 실행안됨????
                         let trTds = tr.querySelectorAll('td');
                         let trBucket = [];
-                        trTds.forEach(td => {
+                        trTds.forEach(td => {Z
                             let text;
                             text = td.innerText;
                             trBucket.push(text);
