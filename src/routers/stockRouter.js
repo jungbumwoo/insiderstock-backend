@@ -1,5 +1,5 @@
 import express from "express";
-import { getAllStock, saveStock, getOwnedStock, addInterest, addOnboard } from "../controllers/stockController";
+import { getAllStock, saveStock, getOwnedStock, addInterest, addOnboard } from "../controllers/stockController2";
 const router = express.Router();
 
 router.get('/stock', getAllStock);

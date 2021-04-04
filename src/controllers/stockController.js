@@ -85,7 +85,7 @@ const nextpage = async (pageNumber, waitsecond = 50000, page) => {
                         console.log(tr); // 이 줄은 왜 실행안됨????
                         let trTds = tr.querySelectorAll('td');
                         let trBucket = [];
-                        trTds.forEach(td => {Z
+                        trTds.forEach(td => {
                             let text;
                             text = td.innerText;
                             trBucket.push(text);
@@ -106,35 +106,38 @@ const nextpage = async (pageNumber, waitsecond = 50000, page) => {
     }
 }
 
-const getToday = () => {
-    let timeNow = new Date();
-    let year = timeNow.getFullYear();
-    let month = ("0" + (1 + timeNow.getMonth())).slice(-2);
-    let day = ("0" + timeNow.getDate()).slice(-2);
+// const getToday = () => {
+//     let timeNow = new Date();
+//     let year = timeNow.getFullYear();
+//     let month = ("0" + (1 + timeNow.getMonth())).slice(-2);
+//     let day = ("0" + timeNow.getDate()).slice(-2);
     
-    return year + '-' + month + '-' + day;
-}
+//     return year + '-' + month + '-' + day;
+// }
 
-const diffDate = (day1, day2) => {
-    let strDay1 = day1.split('-');
-    let strDay2 = day2.split('-');
+// const diffDate = (day1, day2) => {
+//     let strDay1 = day1.split('-');
+//     let strDay2 = day2.split('-');
     
-    let date1 = new Date(strDay1[0], strDay1[1] -1, strDay1[2]);
-    let date2 = new Date(strDay2[0], strDay2[1] -1, strDay2[2]);
+//     let date1 = new Date(strDay1[0], strDay1[1] -1, strDay1[2]);
+//     let date2 = new Date(strDay2[0], strDay2[1] -1, strDay2[2]);
 
-    let diff = (date1 - date2) / (1000*60*60*24); 
-    return diff;
-}
+//     let diff = (date1 - date2) / (1000*60*60*24); 
+//     return diff;
+// }
 
 const loopPage = async (pageNum, existList, page) => {
     try {
         console.log(`loopPage with pageNum: ${pageNum}`);
-        if (pageNum == 2) {
+        //final
+        if (pageNum == 5) {
             console.log('loop will end');
             let finalLoopPageList = existList;
             console.log(finalLoopPageList[finalLoopPageList.length -1][0]);
             return finalLoopPageList;
+            
         } else {
+            // loop
             let nextpagelist = await nextpage(pageNum, 5000, page);
             let addedList = existList.concat(nextpagelist);
             let today = getToday();
