@@ -28,7 +28,7 @@ export const getAllStock = (req, res) => {
 
             //GET DATA         
             let result = await getData(page, today);
-            console.log(result);
+            console.log(result[result.length-1]);
                         
 
             //only get "buy" data
@@ -107,7 +107,6 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
             let nextpage = pageNum + 1;
             await getData(page, today, nextpage, resultArray);
         } else {
-            console.log(resultArray);
             return await resultArray;
         }
     } catch(err) {
