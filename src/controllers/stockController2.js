@@ -21,15 +21,15 @@ export const getAllStock = (req, res) => {
             await page.click('#login_form > div > table > tbody > tr:nth-child(3) > td > input');
             console.log("Login GURU submit");
             await page.waitForSelector('#menu > li:nth-child(5) > div > div > ul > li:nth-child(1) > a');
-            console.log("5");
             await page.evaluate(() => document.querySelector('#menu > li:nth-child(5) > div > div > ul > li:nth-child(1) > a').click());
             await page.waitForNavigation();
             let today = getToday();
 
             //GET DATA         
-            let result = await getData(page, today);
-            console.log(result[result.length-1]);
-                        
+            let totalResult = await getData(page, today);
+            console.log(totalResult.length);
+            const buyResult = totalResult.filter(egg => egg[7] == 'Buy');
+            console.log(buyResult.length);
 
             //only get "buy" data
             // let buyresult = buyfilter(finalresult);
@@ -66,7 +66,7 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
             //     `document.querySelector(${activeNum}).innerText.includes(${pageNum})`,
             //    );
             // page.waitForNavigation({ waitUntil: ['networkidle2'] })
-            await page.waitForTimeout(3000);
+            await page.waitForTimeout(2000);
             //     .then(() => console.log('Waited for click reload'));
             // await Promise.all([
             //     page.waitForNavigation({ waitUntil: ['networkidle0'] }),
@@ -103,11 +103,12 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
         let dateDifference = diffDate(today, lastDataDate);
         console.log(`Date Diff: ${dateDifference}`);
 
-        if(dateDifference < 5) {
+        if(dateDifference < 6) {
             let nextpage = pageNum + 1;
-            await getData(page, today, nextpage, resultArray);
+            return await getData(page, today, nextpage, resultArray);
         } else {
-            return await resultArray;
+            console.log(resultArray.length);
+            return resultArray;
         }
     } catch(err) {
         console.log(err);
