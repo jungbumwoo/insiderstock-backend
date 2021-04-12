@@ -10,28 +10,31 @@ export const getAllStock = (req, res) => {
             console.log("getAllStock Func executed");
             const browser = await puppeteer.launch();
             const page = await browser.newPage();
-            await page.goto('https://www.gurufocus.com/insider/summary');
+            await page.goto('https://www.gurufocus.com/forum/login.php?0');
             
-            // waitFor login Request and close(click) the request requirement
-            // How about to use another Func?
-            const selector = 'body > div.el-dialog__wrapper > div > div.el-dialog__header > button';
-            await page.waitForSelector(selector);
-            await page.click(selector);
-            let today = getToday();
-            let result = await getData(page, today);
-            
-            //pageNum
-            const activePageTag = '#components-root > div > div.insider-page > div:nth-child(9) > div > ul > li.number.active';
-            let pageNum = await page.$eval(activePageTag, num => num.innerText);
+            // Login
+            await page.waitForSelector('#txt-username');
+            await page.type('#txt-username', process.env.GURU_ID);
+            await page.type('#txt-password', process.env.GURU_PASSWORD);
 
-            //approach to next pages
-            let pageNumInt = parseInt(pageNum);
-            
+            //submit
+            await page.click('#login_form > div > table > tbody > tr:nth-child(3) > td > input');
+            console.log("Login GURU submit");
+            await page.waitForSelector('#menu > li:nth-child(5) > div > div > ul > li:nth-child(1) > a');
+            console.log("5");
+            await page.evaluate(() => document.querySelector('#menu > li:nth-child(5) > div > div > ul > li:nth-child(1) > a').click());
+            await page.waitForNavigation();
+            let today = getToday();
+
+            //GET DATA         
+            let result = await getData(page, today);
+            console.log(result);
+                        
 
             //only get "buy" data
             // let buyresult = buyfilter(finalresult);
 
-            await browser.close();
+            // await browser.close();
             // return res.status(200).json({ buyresult });
         } catch(err) {
             console.log(err)
@@ -46,40 +49,69 @@ export const getAllStock = (req, res) => {
 
 
 let getData = async(page, today, pageNum = 1, totalList = []) => {
-    if (pageNum !== 1) {
-        // go to next page
-    }
-    // Wait for data
-    const trTag = '#wrapper > div > table > tbody > tr';
-    await page.waitForSelector(trTag);
+    try {
+        console.log(`getData Func page: ${page}, today: ${today}, pageNum: ${pageNum}`);
+        if (pageNum !== 1) {
+            // go to next page
+            console.log("if nextpage")
+            let changedUrl = `#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li:nth-child(${pageNum})` 
+            // await page.waitForFunction(`(async(page) => {
+            //     await page.$eval(changedUrl, li => li.click())
+            // })()`, {}, page)
+            let activeNum = '#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li.number.active';
+            await page.evaluate(x => {
+                return document.querySelector(x).click();
+            }, changedUrl);
+            // await page.waitForFunction(
+            //     `document.querySelector(${activeNum}).innerText.includes(${pageNum})`,
+            //    );
+            // page.waitForNavigation({ waitUntil: ['networkidle2'] })
+            await page.waitForTimeout(3000);
+            //     .then(() => console.log('Waited for click reload'));
+            // await Promise.all([
+            //     page.waitForNavigation({ waitUntil: ['networkidle0'] }),
+            //     page.$eval(changedUrl, li => li.click())
+            // ])
+        };        
+        // await page.evaluate(x => {
+            //     console.log(`currentPage: ${x}`)
+            // }, currentPage);
+            // let currentPageText = await page.$eval(currentPage, (x)=> x.innerHTML);
 
-    // Get data from current Data
-    const mainpage = await page.$$eval(trTag, trs => {
-    let bucket = [];
-    trs.forEach(tr => {
-            // bucket.push(tr.innerHTML);
-            let trTds = tr.querySelectorAll('td');
-            let trBucket = [];
-            trTds.forEach(td => {
-                let text;
-                text = td.innerText;
-                trBucket.push(text);
-            })
-            bucket.push(trBucket);
-        })
-        return bucket;
-    }
-    );
-    totalList.concat(mainpage);
-    let lastDataDate = mainpage[mainpage.length-1][6];
-    let dateDifference = diffDate(today, lastDataDate);
-    console.log(`Date Diff: ${dateDifference}`);
+        const trTag = '#wrapper > div > table > tbody > tr';
+        await page.waitForSelector(trTag);
 
-    if(dateDifference < 5){
-        let nextpage = pageNum + 1;
-        getData(page, today, nextpage, totalList);
-    } else {
-        return totalList;
+        // Get data from current Data
+        let mainpage = await page.$$eval(trTag, trs => {
+            let bucket = [];
+            trs.forEach(tr => {
+                    // bucket.push(tr.innerHTML);
+                    let trTds = tr.querySelectorAll('td');
+                    let trBucket = [];
+                    trTds.forEach(td => {
+                        let text;
+                        text = td.innerText;
+                        trBucket.push(text);
+                    })
+                    bucket.push(trBucket);
+                })
+                return bucket;
+            }
+        );
+        let resultArray = totalList.concat(mainpage);
+        let lastDataDate = mainpage[mainpage.length-1][6];
+        let dateDifference = diffDate(today, lastDataDate);
+        console.log(`Date Diff: ${dateDifference}`);
+
+        if(dateDifference < 5) {
+            let nextpage = pageNum + 1;
+            await getData(page, today, nextpage, resultArray);
+        } else {
+            console.log(resultArray);
+            return await resultArray;
+        }
+    } catch(err) {
+        console.log(err);
     }
 
     // date caculate and return or recursive
