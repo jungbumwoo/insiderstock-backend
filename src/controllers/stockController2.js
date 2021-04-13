@@ -3,7 +3,6 @@ import puppeteer from "puppeteer";
 // 첫 페이지 뜨는 거 읽은 다음에 다음 페이지는 상황을 봐가며 읽던가 멈추던가 하는 방법이 있고
 // 아에 처음부터 페이지를 돌리는데 상황을 보고 멈추는 방법도 있고.
 
-
 export const getAllStock = (req, res) => {
     (async () => {
         try {
@@ -27,15 +26,13 @@ export const getAllStock = (req, res) => {
 
             //GET DATA         
             let totalResult = await getData(page, today);
-            console.log(totalResult.length);
-            const buyResult = totalResult.filter(egg => egg[7] == 'Buy');
-            console.log(buyResult.length);
 
-            //only get "buy" data
-            // let buyresult = buyfilter(finalresult);
+            //filter (Only for Buy Data)
+            const buyresult = totalResult.filter(egg => egg[7] == 'Buy');
+            console.log(buyresult);
 
-            // await browser.close();
-            // return res.status(200).json({ buyresult });
+            await browser.close();
+            return res.status(200).json({ buyresult });
         } catch(err) {
             console.log(err)
         }
@@ -45,8 +42,6 @@ export const getAllStock = (req, res) => {
     //     return res.status(200).json({ final });
     // })
 }
-
-
 
 let getData = async(page, today, pageNum = 1, totalList = []) => {
     try {
@@ -107,13 +102,11 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
             let nextpage = pageNum + 1;
             return await getData(page, today, nextpage, resultArray);
         } else {
-            console.log(resultArray.length);
             return resultArray;
         }
     } catch(err) {
         console.log(err);
     }
-
     // date caculate and return or recursive
 };
 
@@ -137,10 +130,6 @@ const diffDate = (day1, day2) => {
     return diff;
 }
 
-const buyfilter = (list) => {
-    const result = list.filter(tr => tr[7] == "Buy");
-    return result
-}
 
 export const saveStock = async(req, res) => {
     const { data } = req.body;
