@@ -29,8 +29,6 @@ export const getAllStock = (req, res) => {
 
             //filter (Only for Buy Data)
             const buyresult = totalResult.filter(egg => egg[7] == 'Buy');
-            console.log(buyresult);
-
             await browser.close();
             return res.status(200).json({ buyresult });
         } catch(err) {
@@ -53,7 +51,7 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
             // await page.waitForFunction(`(async(page) => {
             //     await page.$eval(changedUrl, li => li.click())
             // })()`, {}, page)
-            let activeNum = '#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li.number.active';
+            // let activeNum = '#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li.number.active';
             await page.evaluate(x => {
                 return document.querySelector(x).click();
             }, changedUrl);

@@ -17,7 +17,6 @@ export const getToken = (req, res, next) => {
         const { accessToken, user } = req.session.passport.user;
         console.log("getToken Func / username:");
         console.log(user.name);
-        localStorage.setItem('userInfo', accessToken);
         res.cookie('userName', user.name, { expiresIn: '1d'});
         // res.clearCookie('token');
         return res.redirect(`http://localhost:3000/${accessToken}/#`);
