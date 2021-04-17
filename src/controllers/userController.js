@@ -20,7 +20,6 @@ export const getToken = (req, res, next) => {
         res.cookie('userName', user.name, { expiresIn: '1d'});
         // res.clearCookie('token');
         return res.redirect(`http://localhost:3000/${accessToken}/#`);
-
     } else {
         //signup
         // const token = req.authInfo;
