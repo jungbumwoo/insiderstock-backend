@@ -1,5 +1,6 @@
 import passport from "passport";
 import FacebookStrategy from "passport-facebook";
+import KakaoStrategy from "passport-kakao";
 import User from "./models/User.js";
 
 passport.serializeUser(function(info, cb) {
@@ -33,7 +34,8 @@ passport.use(new FacebookStrategy({
             } else {
                 user = new User({
                     id: id,
-                    name: name
+                    name: name,
+                    provider: 'facebook'
                 });
                 user.save(function(err) {
                     if(err){
@@ -49,5 +51,34 @@ passport.use(new FacebookStrategy({
                 })
             }
         });
-    }
+    },
 ))
+
+passport.use(new KakaoStrategy({
+    clientID: process.env.KAKAO_CLIENTID,
+    clientSecret: process.env.KAKAO_CLIENTPASSWORD,
+    callbackURL: process.env.KAKACO_CALLBACK,
+    },
+    function(accessToken, refreshToken, profile, done) {
+        User.findOne({
+            id: profile.id
+        }, (err, user) => {
+            if(err){ return done(err) }
+            if(!user){
+                user = new User({
+                    name: profile.username,
+                    provider: 'kakao'
+                })
+
+                user.save(function(err) {
+                    if(err){
+                        console.log(err)
+                    }
+                    return done(err, user)
+                })
+            } else {
+                return done(err, user);
+            }
+        })
+    }
+    ))
