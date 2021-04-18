@@ -60,6 +60,7 @@ passport.use(new KakaoStrategy({
     callbackURL: process.env.KAKACO_CALLBACK,
     },
     function(accessToken, refreshToken, profile, done) {
+        console.log("kakaoStrategy at passport");
         User.findOne({
             id: profile.id
         }, (err, user) => {
