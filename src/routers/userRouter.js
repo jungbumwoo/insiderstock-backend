@@ -1,6 +1,6 @@
 import express from "express";
 import passport from "passport";
-import { getLogin, postLogin, getToken, getTokenFacebook, getUser, signout } from "../controllers/userController.js";
+import { getLogin, postLogin, getToken, getTokenFacebook, getUser, signout, kakaoLogin } from "../controllers/userController.js";
 const router = express.Router();
 
 router.get('/login', getLogin);
@@ -12,7 +12,7 @@ router.get('/auth/facebook/callback',
 
 router.get('/auth/kakao', passport.authenticate('kakao', {
     failureRedirect: '/login'
-}));
+}), kakaoLogin);
 router.get('/oauth', passport.authenticate('kakao', {
     failureRedirect: '/login'
 }), getToken);

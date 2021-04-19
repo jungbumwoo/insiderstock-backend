@@ -55,7 +55,7 @@ passport.use(new FacebookStrategy({
 ))
 
 passport.use(new KakaoStrategy({
-    clientID: process.env.KAKAO_CLIENTID,
+    clientID: process.env.KAKAO_REST_CLIENTID,
     clientSecret: process.env.KAKAO_CLIENTPASSWORD,
     callbackURL: process.env.KAKACO_CALLBACK,
     },

@@ -38,3 +38,9 @@ export const signout = (req, res, next) => {
     res.clearCookie('token');
     return res.status(200).json({"signout": "success"})
 }
+
+export const kakaoLogin = (req, res) => {
+    console.log('kakao passport');
+    console.log(req);
+
+}
