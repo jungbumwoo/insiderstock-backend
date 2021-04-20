@@ -7,7 +7,9 @@ import { getLogin,
     getUser, 
     signout, 
     kakaoLogin,
-    kakaoRestApi } from "../controllers/userController.js";
+    kakaoRestApi,
+    postKakaoJsLogin
+ } from "../controllers/userController.js";
 const router = express.Router();
 
 router.get('/login', getLogin);
@@ -28,7 +30,7 @@ router.get('/auth/kakao/restapi', kakaoRestApi);
 
 router.get('/auth/getuser', getUser);
 
-
+router.post('/auth/kakao/jslogin', postKakaoJsLogin);
 
 router.get('/auth/signout', signout);
 
