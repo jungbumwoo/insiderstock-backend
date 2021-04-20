@@ -44,3 +44,7 @@ export const kakaoLogin = (req, res) => {
     console.log(req);
 
 }
+
+export const kakaoRestApi = (req, res) => {
+    console.log(req);
+}
