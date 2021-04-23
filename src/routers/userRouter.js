@@ -8,7 +8,8 @@ import { getLogin,
     signout, 
     kakaoLogin,
     kakaoRestApi,
-    postKakaoJsLogin
+    postKakaoJsSignin,
+    postKakaoJsSignup
  } from "../controllers/userController.js";
 const router = express.Router();
 
@@ -30,13 +31,11 @@ router.get('/auth/kakao/restapi', kakaoRestApi);
 
 router.get('/auth/getuser', getUser);
 
-router.post('/auth/kakao/jslogin', postKakaoJsLogin);
+router.post('/auth/kakao/jslogin', postKakaoJsSignin);
+router.post('/auth/kakao/signup', postKakaoJsSignup);
 
 router.get('/auth/signout', signout);
-
     // { successRedirect: 'http://localhost:3000',
     // failureRedirect: '/login'}
-    
-
 export default router;
 
