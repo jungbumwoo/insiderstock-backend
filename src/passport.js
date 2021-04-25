@@ -24,7 +24,7 @@ passport.use(new FacebookStrategy({
         User.findOne({ id }, async function(err, user) {
             if (err) { return done(err); }
             if (user) {
-                console.log("user is exsist");
+                console.log("user info/ FacebookStarategy/ passport.js");
                 console.log(user);
                 let info = {
                     user,
@@ -41,7 +41,6 @@ passport.use(new FacebookStrategy({
                     if(err){
                         console.log(err);
                     } else {
-                        console.log("saving user..");
                         let info = {
                             user,
                             accessToken

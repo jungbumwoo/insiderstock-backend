@@ -1,5 +1,6 @@
 import Stock from "../models/Stock.js";
 import puppeteer from "puppeteer";
+import User from "../models/User";
 // 첫 페이지 뜨는 거 읽은 다음에 다음 페이지는 상황을 봐가며 읽던가 멈추던가 하는 방법이 있고
 // 아에 처음부터 페이지를 돌리는데 상황을 보고 멈추는 방법도 있고.
 
@@ -24,7 +25,7 @@ export const getAllStock = (req, res) => {
             await page.waitForNavigation();
             let today = getToday();
 
-            //GET DATA         
+            //GET DATA
             let totalResult = await getData(page, today);
 
             //filter (Only for Buy Data)
@@ -96,7 +97,7 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
         let dateDifference = diffDate(today, lastDataDate);
         console.log(`Date Diff: ${dateDifference}`);
 
-        if(dateDifference < 3) {
+        if(dateDifference < 4) {
             let nextpage = pageNum + 1;
             return await getData(page, today, nextpage, resultArray);
         } else {
@@ -131,8 +132,7 @@ const diffDate = (day1, day2) => {
 
 export const saveStock = async(req, res) => {
     const { data } = req.body;
-    console.log("saveStock at backend, req!");
-    console.log(req);
+    
     let newTypeData = data.reduce((acc, item) => {
         acc.push({
             ticker: item[0],
@@ -155,10 +155,45 @@ export const saveStock = async(req, res) => {
         return acc
     }, []);
     let result = await Stock.create(newTypeData);
+    console.log("result");
+    console.log(result);
+    let resultDBId = result.map((item) => {
+        return item._id
+    })
+    console.log("resultDBId");
+    console.log(resultDBId);
     let savedList = result.map((item) => {
         return { ticker : item.ticker, 
                 company: item.company}
     })
+    console.log("savedList");
+    console.log(savedList);
+
+    const { _id } = req.user;
+    console.log("_id");
+    console.log(_id);
+    if(_id) {
+        User.findOne({ _id })
+        .exec((error, user) => {
+            if(error){
+                console.log('error at savestock/ stockController');
+                console.log(error);
+                return res.status(400).json({error});
+            }
+            if(user){
+                resultDBId.forEach(id => user.saves.push(id));
+                user.save((error, user) => {
+                    if(error) return res.status(400).json({ error });
+                    if(user){
+                        console.log("user at savestocks, stockController");
+                        console.log(user);
+                    }
+                })
+            }
+        })
+    } else {
+        console.log(`_id: ${id} Authorization issue`);
+    }
     return res.status(200).json({ savedList });
 };
 
