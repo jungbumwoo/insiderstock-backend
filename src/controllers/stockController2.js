@@ -201,6 +201,10 @@ export const getOwnedStock = (req, res) => {
     
 }
 
+export const getSavedStock = (req, res) => {
+    console.log(req);
+}
+
 export const addOnboard = (req, res) => {
     console.log(req.body.data);
 }
