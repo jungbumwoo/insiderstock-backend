@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 import stockRouter from "./src/routers/stockRouter.js";
 import userRouter from "./src/routers/userRouter.js";
 
-import "./src/db";
+import "./src/db.js";
 import "./src/passport.js";
 import passport from "passport";
 dotenv.config();

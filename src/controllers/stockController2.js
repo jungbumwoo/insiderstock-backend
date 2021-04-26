@@ -1,6 +1,7 @@
 import Stock from "../models/Stock.js";
 import puppeteer from "puppeteer";
-import User from "../models/User";
+import User from "../models/User.js";
+import Interest from "../../../front/src/container/Interest/Interest.js";
 // 첫 페이지 뜨는 거 읽은 다음에 다음 페이지는 상황을 봐가며 읽던가 멈추던가 하는 방법이 있고
 // 아에 처음부터 페이지를 돌리는데 상황을 보고 멈추는 방법도 있고.
 
@@ -219,12 +220,22 @@ export const getSavedStock = async(req, res) => {
         console.log(err);
         return res.status(400).json({"message" : "error at getSavedStock"})
     }
-}
+};
 
 export const addOnboard = (req, res) => {
     console.log(req.body.data);
 }
 
-export const addInterest = (req, res) => {
+export const addGetInterest = (req, res) => {
     console.log(req.body.data);
+}
+
+export const addPostInterest = async(req, res) => {
+    let rawData = req.body.data;
+    console.log(rawData);
+    try {
+        let addPostInteResult = await Interest.create
+    } catch(err) {
+        console.log(err);
+    }
 }
