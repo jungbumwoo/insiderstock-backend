@@ -1,7 +1,7 @@
 import Stock from "../models/Stock.js";
 import puppeteer from "puppeteer";
 import User from "../models/User.js";
-import Interest from "../../../front/src/container/Interest/Interest.js";
+import Interest from "../models/Interest.js";
 // 첫 페이지 뜨는 거 읽은 다음에 다음 페이지는 상황을 봐가며 읽던가 멈추던가 하는 방법이 있고
 // 아에 처음부터 페이지를 돌리는데 상황을 보고 멈추는 방법도 있고.
 
@@ -226,15 +226,72 @@ export const addOnboard = (req, res) => {
     console.log(req.body.data);
 }
 
-export const addGetInterest = (req, res) => {
-    console.log(req.body.data);
+export const addGetInterest = async(req, res) => {
+    const { _id } = req.user;
+    try {
+        let userData = User.findOne({ _id })
+        .exec(async(err, user) => {
+            let userIntId = user.interests; 
+            console.log(userIntId);
+            let interested = await Interest.find({ _id: userIntId });
+            return res.status(200).json({ interested });
+        })
+    } catch(err) {
+        console.log(err);
+        return res.status(400).json({ "message": err })
+    }
 }
 
 export const addPostInterest = async(req, res) => {
-    let rawData = req.body.data;
-    console.log(rawData);
+    let { data } = req.body;
+    let { _id } = req.user;
+    let newTypeData = data.reduce((acc, item) => {
+        acc.push({
+            ticker: item[0],
+            company: item[2],
+            currentprice: parseFloat(item[3].replace(/\$/g, '')),
+            insiderName: item[4],
+            insiderPosition: item[5],
+            date: item[6],
+            buyOrSell: item[7],
+            insiderTradingShares: parseFloat(item[8].replace(/\,/, '')),
+            sharesChange: parseFloat(item[9].replace(/\%/g, '')),
+            purchasePrice: parseFloat(item[10].replace(/\$/g, '')),
+            cost: parseFloat(item[11].replace(/\$|\,/g, '')),
+            finalShare: parseInt(item[12].replace(/\,/g, '')),
+            priceChangeSIT: parseFloat(item[13].replace(/\%/, '')),
+            DividendYield: parseFloat(item[14]),
+            PERatio: parseFloat(item[15]),
+            MarketCap: parseFloat(item[16])
+        })
+        return acc
+    }, []);
     try {
-        let addPostInteResult = await Interest.create
+        let result = await Interest.create(newTypeData);
+        let resultDBId = result.map((item) => {
+            return item._id
+        })
+        console.log("resultDBId");
+        console.log(resultDBId);
+
+        console.log(result);
+        if(_id) {
+            await User.findOne({ _id })
+            .exec((err, user) => {
+                if(err) return res.status(400).json({"message": "authoriztion err"});
+                if(user) {    
+                    resultDBId.forEach((id) => {
+                        user.interests.push(id);
+                    })
+                    user.save((err, user) => {
+                        console.log(user);
+                        return res.status(201).json({ result });
+                    })
+                }
+            })
+        } else {
+            return res.status(400).json({"message": "authoriztion err"});
+        }
     } catch(err) {
         console.log(err);
     }

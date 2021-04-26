@@ -24,6 +24,5 @@
   "license": "MIT",
   "scripts": {
     "start": "nodemon --exec babel-node index.js --delay 2"
-  },
-  "type": "module"
+  }
 }
