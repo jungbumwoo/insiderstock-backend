@@ -97,7 +97,7 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
         let dateDifference = diffDate(today, lastDataDate);
         console.log(`Date Diff: ${dateDifference}`);
 
-        if(dateDifference < 4) {
+        if(dateDifference < 5) {
             let nextpage = pageNum + 1;
             return await getData(page, today, nextpage, resultArray);
         } else {
@@ -201,8 +201,24 @@ export const getOwnedStock = (req, res) => {
     
 }
 
-export const getSavedStock = (req, res) => {
-    console.log(req);
+export const getSavedStock = async(req, res) => {
+    try {
+        const { _id } = req.user;
+        console.log(_id);
+        let populateData = await User.findOne({ _id }).populate('save')
+        .exec(async(err, user) => {
+            console.log(user);
+            let savedStockId = user.saves;
+            await Stock.find({ _id: savedStockId})
+            .exec((err, stock) => {
+                console.log(stock);
+                return res.status(200).json({ stock });
+            })
+        })
+    } catch(err) {
+        console.log(err);
+        return res.status(400).json({"message" : "error at getSavedStock"})
+    }
 }
 
 export const addOnboard = (req, res) => {

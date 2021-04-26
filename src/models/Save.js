@@ -24,6 +24,6 @@ const saveSchema = new mongoose.Schema({
     myprice: mongoose.Schema.Types.Decimal128
 });
 
-const model = mongoose.model('Save', saveSchema);
+const model = mongoose.model('save', saveSchema);
 
 export default model;
