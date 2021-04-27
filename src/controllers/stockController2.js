@@ -243,6 +243,7 @@ export const addGetInterest = async(req, res) => {
 }
 
 export const addPostInterest = async(req, res) => {
+    console.log("addPostInterest");
     let { data } = req.body;
     let { _id } = req.user;
     let newTypeData = data.reduce((acc, item) => {
