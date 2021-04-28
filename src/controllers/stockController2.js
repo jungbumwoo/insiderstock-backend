@@ -246,35 +246,13 @@ export const addPostInterest = async(req, res) => {
     console.log("addPostInterest");
     let { data } = req.body;
     let { _id } = req.user;
-    let newTypeData = data.reduce((acc, item) => {
-        acc.push({
-            ticker: item[0],
-            company: item[2],
-            currentprice: parseFloat(item[3].replace(/\$/g, '')),
-            insiderName: item[4],
-            insiderPosition: item[5],
-            date: item[6],
-            buyOrSell: item[7],
-            insiderTradingShares: parseFloat(item[8].replace(/\,/, '')),
-            sharesChange: parseFloat(item[9].replace(/\%/g, '')),
-            purchasePrice: parseFloat(item[10].replace(/\$/g, '')),
-            cost: parseFloat(item[11].replace(/\$|\,/g, '')),
-            finalShare: parseInt(item[12].replace(/\,/g, '')),
-            priceChangeSIT: parseFloat(item[13].replace(/\%/, '')),
-            DividendYield: parseFloat(item[14]),
-            PERatio: parseFloat(item[15]),
-            MarketCap: parseFloat(item[16])
-        })
-        return acc
-    }, []);
     try {
-        let result = await Interest.create(newTypeData);
+        let result = await Interest.create({ stockInfo: data});
         let resultDBId = result.map((item) => {
             return item._id
         })
         console.log("resultDBId");
         console.log(resultDBId);
-
         console.log(result);
         if(_id) {
             await User.findOne({ _id })
@@ -293,6 +271,32 @@ export const addPostInterest = async(req, res) => {
         } else {
             return res.status(400).json({"message": "authoriztion err"});
         }
+    } catch(err) {
+        console.log(err);
+    }
+}
+
+export const deletePostInterest = async(req, res) => {
+    let deleteinfo = req.body;
+    let deleteIds = deleteinfo.map((item) => {
+        return item._id;
+    })
+    let { _id } = req.user;
+    try {
+        let result = await Interest.deleteMany({ _id : deleteIds});
+        console.log("deletePostInterest Result");
+        console.log(result);
+        await User.findOne({ _id })
+        .exec((err, user) => {
+            deleteIds.forEach((id) => {
+                let index = user.interests.indexOf(id);
+                user.interests.splice(index, 1);
+            })
+            user.save((err, user) => {
+                if (err) res.status(400).json({ "message" : "err at deletePostInterest"});
+                if (user) res.status(201).json({"message": "muyaho at deletePostInterst"});
+            })
+        })
     } catch(err) {
         console.log(err);
     }
