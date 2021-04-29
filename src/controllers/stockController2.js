@@ -246,29 +246,30 @@ export const addPostInterest = async(req, res) => {
     console.log("addPostInterest");
     let { data } = req.body;
     let { _id } = req.user;
-    let newTypeData = data.reduce((acc, item) => {
-        acc.push({
-            ticker: item[0],
-            company: item[2],
-            currentprice: parseFloat(item[3].replace(/\$/g, '')),
-            insiderName: item[4],
-            insiderPosition: item[5],
-            date: item[6],
-            buyOrSell: item[7],
-            insiderTradingShares: parseFloat(item[8].replace(/\,/, '')),
-            sharesChange: parseFloat(item[9].replace(/\%/g, '')),
-            purchasePrice: parseFloat(item[10].replace(/\$/g, '')),
-            cost: parseFloat(item[11].replace(/\$|\,/g, '')),
-            finalShare: parseInt(item[12].replace(/\,/g, '')),
-            priceChangeSIT: parseFloat(item[13].replace(/\%/, '')),
-            DividendYield: parseFloat(item[14]),
-            PERatio: parseFloat(item[15]),
-            MarketCap: parseFloat(item[16])
-        })
-        return acc
-    }, []);
+    // let newTypeData = data.reduce((acc, item) => {
+    //     console.log(item);
+    //     acc.push({
+    //         ticker: item[0],
+    //         company: item[2],
+    //         currentprice: parseFloat(item[3].replace(/\$/g, '')),
+    //         insiderName: item[4],
+    //         insiderPosition: item[5],
+    //         date: item[6],
+    //         buyOrSell: item[7],
+    //         insiderTradingShares: parseFloat(item[8].replace(/\,/, '')),
+    //         sharesChange: parseFloat(item[9].replace(/\%/g, '')),
+    //         purchasePrice: parseFloat(item[10].replace(/\$/g, '')),
+    //         cost: parseFloat(item[11].replace(/\$|\,/g, '')),
+    //         finalShare: parseInt(item[12].replace(/\,/g, '')),
+    //         priceChangeSIT: parseFloat(item[13].replace(/\%/, '')),
+    //         DividendYield: parseFloat(item[14]),
+    //         PERatio: parseFloat(item[15]),
+    //         MarketCap: parseFloat(item[16])
+    //     })
+    //     return acc
+    // }, []);
     try {
-        let result = await Interest.create(newTypeData);
+        let result = await Interest.create(data);
         let resultDBId = result.map((item) => {
             return item._id
         })
