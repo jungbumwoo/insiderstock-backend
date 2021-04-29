@@ -10,10 +10,11 @@ export const requireSignin = async(req, res, next) => {
             console.log(user);
             req.user = user;
         } else {
-            return res.status(400).json({ message: 'Authorization Required'});
+            return res.status(400).json({ "message": 'Authorization Required'});
         }
     } catch(Err) {
         console.log(Err);
+        return res.status(400).json({ "message" : Err });
     }
     next();
 }
