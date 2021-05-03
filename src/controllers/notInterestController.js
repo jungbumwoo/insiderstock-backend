@@ -1,3 +1,6 @@
+import Notinterest from "../models/Notinterest.js";
+import User from "../models/User.js";
+
 export const addNotInterest = async(req, res) => {
     console.log("addNotPostInterest");
     let { data } = req.body;
@@ -39,3 +42,22 @@ export const addNotInterest = async(req, res) => {
         console.log(err);
     }
 }
+
+export const getNotInterest = async(req, res) => {
+    console.log("getNotInterest");
+    let { _id } = req.user;
+    try {
+        User.findOne({ _id }).populate('notinterests').exec((err, user) => {
+            if(err) return res.status(400).json({ "message" : "err At getNotInterest"});;
+            if(user) {
+                console.log("notInterest at getNotInterest at notInterestController.js");
+                console.log(user);
+                return res.status(200).json({ "hello": "hi" });
+            }
+        })
+        
+    } catch(err){
+        console.log(err)
+    }
+}
+

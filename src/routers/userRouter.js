@@ -27,7 +27,6 @@ router.get('/oauth', passport.authenticate('kakao', {
     failureRedirect: '/login'
 }), getToken);
 
-router.get('/auth/kakao/restapi', kakaoRestApi);
 
 router.get('/auth/getuser', getUser);
 
