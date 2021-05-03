@@ -2,6 +2,7 @@ import Stock from "../models/Stock.js";
 import puppeteer from "puppeteer";
 import User from "../models/User.js";
 import Interest from "../models/Interest.js";
+import Notinterest from "../models/Notinterest.js";
 // 첫 페이지 뜨는 거 읽은 다음에 다음 페이지는 상황을 봐가며 읽던가 멈추던가 하는 방법이 있고
 // 아에 처음부터 페이지를 돌리는데 상황을 보고 멈추는 방법도 있고.
 
@@ -37,10 +38,6 @@ export const getAllStock = (req, res) => {
             console.log(err)
         }
     })();
-    // .then(final => {
-    //     console.log(final);
-    //     return res.status(200).json({ final });
-    // })
 }
 
 let getData = async(page, today, pageNum = 1, totalList = []) => {
@@ -48,31 +45,22 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
         console.log(`getData Func page: ${page}, today: ${today}, pageNum: ${pageNum}`);
         if (pageNum !== 1) {
             // go to next page
-            console.log("if nextpage")
-            let changedUrl = `#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li:nth-child(${pageNum})` 
-            // await page.waitForFunction(`(async(page) => {
-            //     await page.$eval(changedUrl, li => li.click())
-            // })()`, {}, page)
-            // let activeNum = '#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li.number.active';
+            console.log("if nextpage");
+            let changedUrl = '';
+            if(pageNum < 10) {
+                changedUrl = `#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li:nth-child(${pageNum})`;
+            } else {
+                changedUrl = `#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li:nth-child(6)`;
+            }
+
             await page.evaluate(x => {
                 return document.querySelector(x).click();
             }, changedUrl);
-            // await page.waitForFunction(
-            //     `document.querySelector(${activeNum}).innerText.includes(${pageNum})`,
-            //    );
-            // page.waitForNavigation({ waitUntil: ['networkidle2'] })
+            
             await page.waitForTimeout(2000);
-            //     .then(() => console.log('Waited for click reload'));
-            // await Promise.all([
-            //     page.waitForNavigation({ waitUntil: ['networkidle0'] }),
-            //     page.$eval(changedUrl, li => li.click())
-            // ])
+            
         };        
-        // await page.evaluate(x => {
-            //     console.log(`currentPage: ${x}`)
-            // }, currentPage);
-            // let currentPageText = await page.$eval(currentPage, (x)=> x.innerHTML);
-
+     
         const trTag = '#wrapper > div > table > tbody > tr';
         await page.waitForSelector(trTag);
 
@@ -127,100 +115,16 @@ const diffDate = (day1, day2) => {
     let date2 = new Date(strDay2[0], strDay2[1] -1, strDay2[2]);
 
     let diff = (date1 - date2) / (1000*60*60*24); 
+    if(diff > 20){
+        console.log(`Today: ${date1}`);
+        console.log(`Last Data Date: ${date2}`);
+    }
     return diff;
 }
-
-
-export const saveStock = async(req, res) => {
-    const { data } = req.body;
-    
-    let newTypeData = data.reduce((acc, item) => {
-        acc.push({
-            ticker: item[0],
-            company: item[2],
-            currentprice: parseFloat(item[3].replace(/\$/g, '')),
-            insiderName: item[4],
-            insiderPosition: item[5],
-            date: item[6],
-            buyOrSell: item[7],
-            insiderTradingShares: parseFloat(item[8].replace(/\,/, '')),
-            sharesChange: parseFloat(item[9].replace(/\%/g, '')),
-            purchasePrice: parseFloat(item[10].replace(/\$/g, '')),
-            cost: parseFloat(item[11].replace(/\$|\,/g, '')),
-            finalShare: parseInt(item[12].replace(/\,/g, '')),
-            priceChangeSIT: parseFloat(item[13].replace(/\%/, '')),
-            DividendYield: parseFloat(item[14]),
-            PERatio: parseFloat(item[15]),
-            MarketCap: parseFloat(item[16])
-        })
-        return acc
-    }, []);
-    let result = await Stock.create(newTypeData);
-    console.log("result");
-    console.log(result);
-    let resultDBId = result.map((item) => {
-        return item._id
-    })
-    console.log("resultDBId");
-    console.log(resultDBId);
-    let savedList = result.map((item) => {
-        return { ticker : item.ticker, 
-                company: item.company}
-    })
-    console.log("savedList");
-    console.log(savedList);
-
-    const { _id } = req.user;
-    console.log("_id");
-    console.log(_id);
-    if(_id) {
-        User.findOne({ _id })
-        .exec((error, user) => {
-            if(error){
-                console.log('error at savestock/ stockController');
-                console.log(error);
-                return res.status(400).json({error});
-            }
-            if(user){
-                resultDBId.forEach(id => user.saves.push(id));
-                user.save((error, user) => {
-                    if(error) return res.status(400).json({ error });
-                    if(user){
-                        console.log("user at savestocks, stockController");
-                        console.log(user);
-                    }
-                })
-            }
-        })
-    } else {
-        console.log(`_id: ${id} Authorization issue`);
-    }
-    return res.status(200).json({ savedList });
-};
 
 export const getOwnedStock = (req, res) => {
     
 }
-
-export const getSavedStock = async(req, res) => {
-    try {
-        const { _id } = req.user;
-        console.log(_id);
-        let populateData = await User.findOne({ _id }).populate('save')
-        .exec(async(err, user) => {
-            console.log(user);
-            let savedStockId = user.saves;
-            await Stock.find({ _id: savedStockId})
-            .exec((err, stock) => {
-                console.log(stock);
-                return res.status(200).json({ stock });
-            })
-        })
-    } catch(err) {
-        console.log(err);
-        return res.status(400).json({"message" : "error at getSavedStock"})
-    }
-};
 
 export const addOnboard = (req, res) => {
     console.log(req.body.data);
@@ -246,28 +150,6 @@ export const addPostInterest = async(req, res) => {
     console.log("addPostInterest");
     let { data } = req.body;
     let { _id } = req.user;
-    // let newTypeData = data.reduce((acc, item) => {
-    //     console.log(item);
-    //     acc.push({
-    //         ticker: item[0],
-    //         company: item[2],
-    //         currentprice: parseFloat(item[3].replace(/\$/g, '')),
-    //         insiderName: item[4],
-    //         insiderPosition: item[5],
-    //         date: item[6],
-    //         buyOrSell: item[7],
-    //         insiderTradingShares: parseFloat(item[8].replace(/\,/, '')),
-    //         sharesChange: parseFloat(item[9].replace(/\%/g, '')),
-    //         purchasePrice: parseFloat(item[10].replace(/\$/g, '')),
-    //         cost: parseFloat(item[11].replace(/\$|\,/g, '')),
-    //         finalShare: parseInt(item[12].replace(/\,/g, '')),
-    //         priceChangeSIT: parseFloat(item[13].replace(/\%/, '')),
-    //         DividendYield: parseFloat(item[14]),
-    //         PERatio: parseFloat(item[15]),
-    //         MarketCap: parseFloat(item[16])
-    //     })
-    //     return acc
-    // }, []);
     try {
         let result = await Interest.create(data);
         let resultDBId = result.map((item) => {

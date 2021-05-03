@@ -13,6 +13,9 @@ const userSchema = new mongoose.Schema({
     interests: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'Interest'}  
     ],
+    notinterests: [
+        { type: mongoose.Schema.Types.ObjectId, res: 'Notinterest'}
+    ]
 })
 
 const model = mongoose.model('User', userSchema);
