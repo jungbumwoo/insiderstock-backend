@@ -51,8 +51,9 @@ export const getNotInterest = async(req, res) => {
             if(err) return res.status(400).json({ "message" : "err At getNotInterest"});;
             if(user) {
                 console.log("notInterest at getNotInterest at notInterestController.js");
-                console.log(user);
-                return res.status(200).json({ "hello": "hi" });
+                let notInts = user.notinterests;
+                console.log(notInts);
+                return res.status(200).json({ notInterests: notInts });
             }
         })
         

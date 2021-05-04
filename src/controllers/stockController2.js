@@ -1,8 +1,9 @@
-import Stock from "../models/Stock.js";
 import puppeteer from "puppeteer";
 import User from "../models/User.js";
 import Interest from "../models/Interest.js";
 import Notinterest from "../models/Notinterest.js";
+import jwt from "jsonwebtoken";
+
 // 첫 페이지 뜨는 거 읽은 다음에 다음 페이지는 상황을 봐가며 읽던가 멈추던가 하는 방법이 있고
 // 아에 처음부터 페이지를 돌리는데 상황을 보고 멈추는 방법도 있고.
 
@@ -33,7 +34,70 @@ export const getAllStock = (req, res) => {
             //filter (Only for Buy Data)
             const buyresult = totalResult.filter(egg => egg[7] == 'Buy');
             await browser.close();
+
+            // if logged in, filter the NotInterest
+            if(req.headers.authorization){
+                let token = req.headers.authorization.split(" ")[1];
+                const user = await jwt.verify(token, process.env.JWT_SECRET);
+                User.findOne({ _id: user._id }).populate('notinterests').exec((err, user) => {
+                    if(err) return res.status(400).json({ "message" : "err At getNotInterest"});;
+                    if(user) {
+                        console.log("notInterest at stockController");
+                        let notInts = user.notinterests;
+                        let notIntElement = notInts.map((el) => {
+                            return {ticker: el.ticker, company: el.company}
+                        });
+                        console.log("notIntElement Length");
+                        console.log(notIntElement.length);
+                        console.log("notInts Length");
+                        console.log(notInts.length);
+                        notIntElement.forEach((el) => {
+                            notInts.forEach((th) => {
+                                while(true) {
+                                    console.log(el.ticker, el.company);
+                                    console.log(th.ticker, th.company);
+                                    if(el.ticker == th.ticker && el.company == th.company) {
+                                        let idx = notInts.indexOf(th);
+                                        console.log("idx");
+                                        console.log(idx);
+                                        notInts.splice(idx, 1);
+                                    } else {
+                                        break;
+                                    }
+                                }
+                            });
+                        })
+                        console.log("notInts Length");
+                        console.log(notInts.length);
+                    }
+                })
+            }
             return res.status(200).json({ buyresult });
+
+            // let a = [0, 1, 2, 3, 3, 4, 5, 6];
+            // let b = [1 ,3, 4];
+
+            // b.forEach((el) => {
+            //     while(true) {
+            //         let idx = a.indexOf(el);
+            //         if(idx > -1){
+            //             a.splice(idx, 1);
+            //         } else {
+            //             break;
+            //         }
+            //     }
+            // })
+            // console.log(a);
+
+            // let deleteElement = notIntElement.map((el) => {
+            //     let filterResult = buyresult.filter((buy) => {
+            //         console.log(buy[2], buy[0]);
+            //         console.log(el.company, el.ticker);
+            //         return el.company == buy[2] && el.ticker == buy[0]
+            //     });
+            //     console.log("filterResult");
+            //     console.log(filterResult);
+            // })
         } catch(err) {
             console.log(err)
         }
@@ -86,7 +150,7 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
         let dateDifference = diffDate(today, lastDataDate);
         console.log(`Date Diff: ${dateDifference}`);
 
-        if(dateDifference < 5) {
+        if(dateDifference < 7) {
             let nextpage = pageNum + 1;
             return await getData(page, today, nextpage, resultArray);
         } else {
