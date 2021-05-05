@@ -47,19 +47,11 @@ export const getAllStock = (req, res) => {
                         let notIntElement = notInts.map((el) => {
                             return {ticker: el.ticker, company: el.company}
                         });
-                        console.log("notIntElement Length");
-                        console.log(notIntElement.length);
-                        console.log("notInts Length");
-                        console.log(notInts.length);
                         notIntElement.forEach((el) => {
                             notInts.forEach((th) => {
+                                let idx = notInts.indexOf(th);
                                 while(true) {
-                                    console.log(el.ticker, el.company);
-                                    console.log(th.ticker, th.company);
                                     if(el.ticker == th.ticker && el.company == th.company) {
-                                        let idx = notInts.indexOf(th);
-                                        console.log("idx");
-                                        console.log(idx);
                                         notInts.splice(idx, 1);
                                     } else {
                                         break;
@@ -67,8 +59,6 @@ export const getAllStock = (req, res) => {
                                 }
                             });
                         })
-                        console.log("notInts Length");
-                        console.log(notInts.length);
                     }
                 })
             }
