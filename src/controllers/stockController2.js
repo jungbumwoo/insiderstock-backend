@@ -51,7 +51,7 @@ export const getAllStock = (req, res) => {
                             notInts.forEach((th) => {
                                 let idx = notInts.indexOf(th);
                                 while(true) {
-                                    if(el.ticker == th.ticker && el.company == th.company) {
+                                    if(el.ticker == th.ticker && el.company == th.company && idx > -1) {
                                         notInts.splice(idx, 1);
                                     } else {
                                         break;
