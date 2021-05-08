@@ -4,6 +4,7 @@ const notinterestSchema = new mongoose.Schema({
     ticker: String,
     company: String,
     insiderName: String,
+    MarketCap: mongoose.Schema.Types.Decimal128,
     date: { type: Date, default: Date.now },
 });
 

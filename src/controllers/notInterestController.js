@@ -4,11 +4,13 @@ import User from "../models/User.js";
 export const addNotInterest = async(req, res) => {
     console.log("addNotPostInterest");
     let { data } = req.body;
+    console.log(data);
     let notInterest = data.map(el => {
         return {
             ticker: el.ticker,
             company: el.company,
-            insiderName: el.insiderName
+            insiderName: el.insiderName,
+            MarketCap: el.MarketCap
         }
     });
     let { _id } = req.user;
