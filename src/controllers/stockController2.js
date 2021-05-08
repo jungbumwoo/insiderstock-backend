@@ -33,6 +33,7 @@ export const getAllStock = (req, res) => {
 
             //filter (Only for Buy Data)
             const buyresult = totalResult.filter(egg => egg[7] == 'Buy');
+            console.log(buyresult.length);
             await browser.close();
 
             // if logged in, filter the NotInterest
@@ -48,11 +49,13 @@ export const getAllStock = (req, res) => {
                             return {ticker: el.ticker, company: el.company}
                         });
                         notIntElement.forEach((el) => {
-                            notInts.forEach((th) => {
-                                let idx = notInts.indexOf(th);
+                            buyresult.forEach((th) => {
                                 while(true) {
-                                    if(el.ticker == th.ticker && el.company == th.company && idx > -1) {
-                                        notInts.splice(idx, 1);
+                                    let idx = buyresult.indexOf(th);
+                                    if(el.ticker == th[0] && el.company == th[2] && idx > -1) {
+                                        console.log("delete!!!");
+                                        console.log(buyresult[idx]);
+                                        buyresult.splice(idx, 1);
                                     } else {
                                         break;
                                     }
@@ -60,6 +63,7 @@ export const getAllStock = (req, res) => {
                             });
                         })
                     }
+                    console.log(buyresult.length);
                 })
             }
             return res.status(200).json({ buyresult });
@@ -190,7 +194,6 @@ export const addGetInterest = async(req, res) => {
         let userData = User.findOne({ _id })
         .exec(async(err, user) => {
             let userIntId = user.interests; 
-            console.log(userIntId);
             let interested = await Interest.find({ _id: userIntId });
             return res.status(200).json({ interested });
         })
