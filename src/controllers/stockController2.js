@@ -218,7 +218,11 @@ export const addPostInterest = async(req, res) => {
         if(_id) {
             await User.findOne({ _id })
             .exec((err, user) => {
-                if(err) return res.status(400).json({"message": "authoriztion err"});
+                if(err) {
+                    console.log("Err at addPostInterest");
+                    console.log(err);
+                    return res.status(400).json({"message": "authoriztion err"});
+                }
                 if(user) {    
                     resultDBId.forEach((id) => {
                         user.interests.push(id);
