@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import stockRouter from "./src/routers/stockRouter.js";
 import userRouter from "./src/routers/userRouter.js";
 import notInterestRouter from "./src/routers/notInterestRouter.js";
+import onboardRouter from "./src/routers/onboardRouter.js";
 
 import "./src/db.js";
 import "./src/passport.js";
@@ -28,6 +29,7 @@ app.use(cors());
 app.use('/api', stockRouter);
 app.use('/api', userRouter);
 app.use('/api', notInterestRouter);
+app.use('/api', onboardRouter);
 
 
 app.listen(PORT, () => {
