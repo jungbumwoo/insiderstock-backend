@@ -1,4 +1,4 @@
-import express, { response } from "express";
+import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
@@ -30,7 +30,6 @@ app.use('/api', stockRouter);
 app.use('/api', userRouter);
 app.use('/api', notInterestRouter);
 app.use('/api', onboardRouter);
-
 
 app.listen(PORT, () => {
     console.log(`✅ Listening on at http://localhost:${process.env.PORT}`);
