@@ -2,7 +2,6 @@ import Onboard from "../models/Onboard.js";
 import User from "../models/User.js";
 
 export const postAddOnboard = async (req, res) => {
-
     const { onboardList} = req.body;
     const { _id } = req.user;
     // Object => Array
@@ -64,7 +63,7 @@ export const getOnboard = (req, res) => {
     const { _id } = req.user;
     try {
         User.findOne({ _id }).populate('onboards')
-        .then((err, user) => {
+        .exec((err, user) => {
             if(err) return res.status(400).json({ "message" : "Error!!"})
             if(user) {
                 let onboardList = user.onboards;

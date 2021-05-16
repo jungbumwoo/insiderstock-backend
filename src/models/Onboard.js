@@ -3,9 +3,9 @@ import mongoose from "mongoose";
 const onboardSchema = new mongoose.Schema({
     ticker: String,
     company: String,
-    MarketCap: mongoose.Schema.Types.Decimal128,
+    marketCap: mongoose.Schema.Types.Decimal128,
     price: mongoose.Schema.Types.Decimal128,
-    share: Number,
+    shares: Number,
     cost: mongoose.Schema.Types.Decimal128,
     date: { type: Date },
 });
