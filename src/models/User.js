@@ -12,6 +12,9 @@ const userSchema = new mongoose.Schema({
     ],
     notinterests: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'Notinterest'}
+    ],
+    bans: [
+        { type: mongoose.Schema.Types.ObjectId, ref: 'Ban'}
     ]
 })
 

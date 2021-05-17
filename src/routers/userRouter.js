@@ -6,8 +6,6 @@ import { getLogin,
     getTokenFacebook, 
     getUser, 
     signout, 
-    kakaoLogin,
-    kakaoRestApi,
     postKakaoJsSignin,
     postKakaoJsSignup
  } from "../controllers/userController.js";
@@ -20,9 +18,6 @@ router.get('/auth/facebook/callback',
     getTokenFacebook
 );
 
-router.get('/auth/kakao', passport.authenticate('kakao', {
-    failureRedirect: '/login'
-}), kakaoLogin);
 router.get('/oauth', passport.authenticate('kakao', {
     failureRedirect: '/login'
 }), getToken);

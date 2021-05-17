@@ -27,7 +27,7 @@ export const postAddOnboard = async (req, res) => {
             marketCap: parseFloat(el[5])
         }
     });
-    console.log(onboardObj);
+    
 
     // Save in MongoDB
     try {
@@ -45,7 +45,6 @@ export const postAddOnboard = async (req, res) => {
                         user.onboards.push(id);
                     })
                     user.save((err, user) => {
-                        console.log(user);
                         return res.status(201).json({ result });
                     })
                 } else {
@@ -67,7 +66,6 @@ export const getOnboard = (req, res) => {
             if(err) return res.status(400).json({ "message" : "Error!!"})
             if(user) {
                 let onboardList = user.onboards;
-                console.log(onboardList);
                 return res.status(200).json({ onboards: onboardList });
             }
         })

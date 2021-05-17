@@ -18,8 +18,6 @@ export const getTokenFacebook = (req, res, next) => {
     if(true) {
         // signin
         const { accessToken, user } = req.session.passport.user;
-        console.log("getToken Func / username:");
-        console.log(user.name);
         res.cookie('userName', user.name, { expiresIn: '1d'});
         // res.clearCookie('token');
         return res.redirect(`http://localhost:3000/${accessToken}/#`);
@@ -30,7 +28,6 @@ export const getTokenFacebook = (req, res, next) => {
 }
 
 export const getToken = (req, res) => {
-    console.log(req);
     return res.status(200).json({"getTokenResult": "muyaho"});
 };
 
@@ -40,16 +37,6 @@ export const signout = (req, res, next) => {
     req.session = null;
     res.clearCookie('token');
     return res.status(200).json({"signout": "success"})
-}
-
-export const kakaoLogin = (req, res) => {
-    console.log('kakao passport');
-    console.log(req);
-
-}
-
-export const kakaoRestApi = (req, res) => {
-    console.log(req);
 }
 
 export const postKakaoJsSignup = (req, res) => {
@@ -82,8 +69,7 @@ export const postKakaoJsSignup = (req, res) => {
 }
 
 export const postKakaoJsSignin = (req, res) => {
-    console.log("postKakaoJsSignin at userController");
-    console.log(req.body);
+    console.log("✅ postKakaoJsSignin at userController");
     const nickname = req.body.nickname;
     const { profileImg110, userid } = req.body;
 

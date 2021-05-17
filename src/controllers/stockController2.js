@@ -40,21 +40,24 @@ export const getAllStock = (req, res) => {
             if(req.headers.authorization){
                 let token = req.headers.authorization.split(" ")[1];
                 const user = await jwt.verify(token, process.env.JWT_SECRET);
-                User.findOne({ _id: user._id }).populate('notinterests').exec((err, user) => {
+                User.findOne({ _id: user._id }).populate('notinterests').populate('bans').exec((err, user) => {
                     if(err) return res.status(400).json({ "message" : "err At getNotInterest"});;
                     if(user) {
                         console.log("notInterest at stockController");
                         let notInts = user.notinterests;
+                        let bans = user.bans;
                         let notIntElement = notInts.map((el) => {
                             return {ticker: el.ticker, company: el.company}
                         });
-                        notIntElement.forEach((el) => {
+                        let bansElement = bans.map((el) => {
+                            return {ticker: el.ticker, company: el.company}
+                        })
+                        let totalexclude = notIntElement.concat(bansElement);
+                        totalexclude.forEach((el) => {
                             buyresult.forEach((th) => {
                                 while(true) {
                                     let idx = buyresult.indexOf(th);
                                     if(el.ticker == th[0] && el.company == th[2] && idx > -1) {
-                                        console.log("delete!!!");
-                                        console.log(buyresult[idx]);
                                         buyresult.splice(idx, 1);
                                     } else {
                                         break;
@@ -64,34 +67,9 @@ export const getAllStock = (req, res) => {
                         })
                     }
                     console.log(buyresult.length);
+                    return res.status(200).json({ buyresult });
                 })
             }
-            return res.status(200).json({ buyresult });
-
-            // let a = [0, 1, 2, 3, 3, 4, 5, 6];
-            // let b = [1 ,3, 4];
-
-            // b.forEach((el) => {
-            //     while(true) {
-            //         let idx = a.indexOf(el);
-            //         if(idx > -1){
-            //             a.splice(idx, 1);
-            //         } else {
-            //             break;
-            //         }
-            //     }
-            // })
-            // console.log(a);
-
-            // let deleteElement = notIntElement.map((el) => {
-            //     let filterResult = buyresult.filter((buy) => {
-            //         console.log(buy[2], buy[0]);
-            //         console.log(el.company, el.ticker);
-            //         return el.company == buy[2] && el.ticker == buy[0]
-            //     });
-            //     console.log("filterResult");
-            //     console.log(filterResult);
-            // })
         } catch(err) {
             console.log(err)
         }
