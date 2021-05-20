@@ -1,7 +1,13 @@
 import puppeteer from "puppeteer";
 import schedule from "node-schedule";
 
-schedule.scheduleJob('32 * * * *', async() => {
+import Info from "./models/Info.js";
+
+// schedule.scheduleJob('0 * * * *', async() => {
+    
+// });
+
+const collectData = async() => {
     console.log('what the what!!');
     try {
         console.log("getAllStock Func executed");
@@ -24,9 +30,27 @@ schedule.scheduleJob('32 * * * *', async() => {
 
         //GET DATA
         let totalResult = await getData(page, today);
+        console.log(totalResult[0]);
 
         //filter (Only for Buy Data)
         await browser.close();
+
+        let totalResultObject = totalResult.map(el => {
+            return {
+                ticker: el[0],
+                company: el[2],
+                currentprice: el[3],
+                insiderName: el[4],
+                insiderPosition: el[5],
+                date: el[6],
+                buyOrSell:el[7],
+                insiderTradingShares: el[8],
+                sharesChange: el[9],
+                purchasePrice: el[10],
+
+            }
+        })
+
         const buyresult = totalResult.filter(egg => egg[7] == 'Buy');
         console.log(buyresult.length);
 
@@ -67,7 +91,7 @@ schedule.scheduleJob('32 * * * *', async() => {
     } catch(err) {
         console.log(err)
     }
-});
+}
 
 let getData = async(page, today, pageNum = 1, totalList = []) => {
     try {

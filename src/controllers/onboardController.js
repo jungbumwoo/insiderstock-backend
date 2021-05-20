@@ -27,8 +27,6 @@ export const postAddOnboard = async (req, res) => {
             marketCap: parseFloat(el[5])
         }
     });
-    
-
     // Save in MongoDB
     try {
         let result = await Onboard.create(onboardObj);

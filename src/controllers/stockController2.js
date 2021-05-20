@@ -158,14 +158,6 @@ const diffDate = (day1, day2) => {
     return diff;
 }
 
-export const getOwnedStock = (req, res) => {
-    
-}
-
-export const addOnboard = (req, res) => {
-    console.log(req.body.data);
-}
-
 export const addGetInterest = async(req, res) => {
     const { _id } = req.user;
     try {
