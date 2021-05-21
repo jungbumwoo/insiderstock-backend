@@ -33,6 +33,7 @@ export const getAllStock = (req, res) => {
 
             //filter (Only for Buy Data)
             const buyresult = totalResult.filter(egg => egg[7] == 'Buy');
+            console.log(buyresult[0]);
             console.log(buyresult.length);
             await browser.close();
 

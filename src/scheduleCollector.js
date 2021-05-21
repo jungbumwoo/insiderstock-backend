@@ -3,9 +3,10 @@ import schedule from "node-schedule";
 
 import Info from "./models/Info.js";
 
-// schedule.scheduleJob('0 * * * *', async() => {
-    
-// });
+
+schedule.scheduleJob('36 * * * *', () => {
+    collectData();
+});
 
 const collectData = async() => {
     console.log('what the what!!');
@@ -39,17 +40,24 @@ const collectData = async() => {
             return {
                 ticker: el[0],
                 company: el[2],
-                currentprice: el[3],
+                currentprice: parseFloat(el[3].replace(/(\$|,)/g, '')),
                 insiderName: el[4],
                 insiderPosition: el[5],
                 date: el[6],
                 buyOrSell:el[7],
-                insiderTradingShares: el[8],
-                sharesChange: el[9],
-                purchasePrice: el[10],
-
+                insiderTradingShares: parseInt(el[8].replace(/,/g, "")),
+                sharesChange: parseFloat(el[9].replace('%', '') ),
+                purchasePrice: parseFloat(el[10].replace(/(\$|,)/g, '')),
+                cost: parseFloat(el[11].replace(/(\$|,)/g, '')),
+                finalShare: parseInt(el[12].replace(/,/g, "")),
+                priceChangeSIT: parseFloat(el[13].replace('%', '')),
+                DividendYield: parseFloat(el[14].replace('%', '')),
+                PERatio: parseFloat(el[15].replace('%', '')),
+                MarketCap: parseFloat(el[16].replace(/,/g, ""))
             }
         })
+
+        await Info.create(totalResultObject);
 
         const buyresult = totalResult.filter(egg => egg[7] == 'Buy');
         console.log(buyresult.length);
@@ -139,7 +147,7 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
         let dateDifference = diffDate(today, lastDataDate);
         console.log(`Date Diff: ${dateDifference}`);
 
-        if(dateDifference < 7) {
+        if(dateDifference < 3) {
             let nextpage = pageNum + 1;
             return await getData(page, today, nextpage, resultArray);
         } else {
