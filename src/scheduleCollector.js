@@ -4,7 +4,7 @@ import schedule from "node-schedule";
 import Info from "./models/Info.js";
 
 
-schedule.scheduleJob('36 * * * *', () => {
+schedule.scheduleJob('51 * * * *', () => {
     collectData();
 });
 
@@ -31,7 +31,6 @@ const collectData = async() => {
 
         //GET DATA
         let totalResult = await getData(page, today);
-        console.log(totalResult[0]);
 
         //filter (Only for Buy Data)
         await browser.close();
@@ -55,10 +54,42 @@ const collectData = async() => {
                 PERatio: parseFloat(el[15].replace('%', '')),
                 MarketCap: parseFloat(el[16].replace(/,/g, ""))
             }
+        });
+
+        let exsistInfo = await Info.find({}).exec()
+        .then((info) => {
+            if(info) {
+                console.log("info");
+                console.log(info.length);
+                console.log("info[0]");
+                console.log(info[0]);
+
+                console.log("totalResultObject[0]");
+                console.log(totalResultObject[0]);
+                console.log(totalResultObject.length);
+                let duplications = [];
+                info.forEach((item) => {
+                    item.currentprice = parseFloat(item.currentprice.toString());
+                })
+                console.log("info[0]");
+                console.log(info[0]);
+                totalResultObject.forEach((item) => {
+                    if (info.indexOf(item) === -1){
+                        duplications.push(item);
+                    }
+                })
+                console.log("duplications at exec");
+                console.log(duplications.length);
+                console.log(duplications[0]);
+                return duplications;
+            }
         })
-
-        await Info.create(totalResultObject);
-
+        .then((duplications) => {
+            console.log("duplications.length");
+            console.log(duplications.length);
+            // Info.create(duplications);
+        })
+        
         const buyresult = totalResult.filter(egg => egg[7] == 'Buy');
         console.log(buyresult.length);
 
