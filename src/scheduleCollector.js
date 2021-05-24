@@ -4,9 +4,9 @@ import schedule from "node-schedule";
 import Info from "./models/Info.js";
 
 
-// schedule.scheduleJob('58 * * * *', () => {
-//     collectData();
-// });
+schedule.scheduleJob('58 * * * *', () => {
+    collectData();
+});
 
 const collectData = async() => {
     console.log('what the what!!');
@@ -70,18 +70,6 @@ const collectData = async() => {
         let exsistInfo = await Info.find({}).exec()
         .then((info) => {
             if(info){
-                // console.log(info.length);
-                // console.log("info[0]");
-                console.log("info");
-                // let duplications = [];
-                // totalResultObject.forEach((item) => {
-                //     // console.log(info[0]);
-                //     // console.log(item[0]);
-                //     if (info.indexOf(item) === -1){
-                //         duplications.push(item);
-                //     }
-                // })
-
                 let briefInfo = info.map((item) => {
                     let reformDate = reformDataType(item.date);
                     return {
@@ -109,104 +97,31 @@ const collectData = async() => {
                             break;
                         } 
                         i++;
-                    }
-                    // briefInfo.forEach((el) => {
-                    //     let json_item = JSON.stringify(item);
-                    //     let json_el = JSON.stringify(el);
-                    //     if(json_item == json_el) {
-                    //         let deleteIndex = briefResult.indexOf(item);
-                    //         briefResult.splice(deleteIndex, 1);
-                    //     }
-                    // })
+                    }     
                 })
                 console.log("briefResult.length")
                 console.log(briefResult.length);
-                let a = [1, 2, 3, 4, 5, 6, 7];
-                let b = [1, 2, 3, 4];
-                let c = a.slice();
 
-                c.forEach((item) => {
-                    let i = 0;
-                    while(i < b.length) {
-                        console.log("item, b[]");
-                        console.log(item, b[i]);
-                        if (b[i] == item) {
-                            let index = a.indexOf(item);
-                            a.splice(index, 1);
-                            break;
-                        }
-                        i++;
-                    }
-                    // b.forEach((el) => {
-                    //     console.log("item, el");
-                    //     console.log(item, el);
-                    //     let jsonitem = JSON.stringify(item);
-                    //     let jsonel = JSON.stringify(el);
-                    //     if (jsonitem == jsonel) {
-                    //         console.log(`delete ${a.indexOf(item)}`);
-                    //         let index = a.indexOf(item);
-                    //         a.splice(index, 1);
-                    //     }
-                    // })
+                let newAddData = briefResult.map((item) => {
+                    let indexNum = briefDuplicate.indexOf(item);
+                    return totalResultObject[indexNum];
                 })
-                console.log("a");
-                console.log(a);
-                return briefResult;
-                // 2.
-                // briefResult.forEach((item) => {
-                //     let index = briefInfo.indexOf(item);
-                //     console.log(index);
-                // })
+                return newAddData;
             }
         })
-        .then((briefResult) => {
-            Info.create(briefResult);
+        .then((newAddData) => {
+            if(newAddData.length > 0) {
+                Info.create(newAddData);
+            }
+            console.log("✅ update succeeded");
             return;
         })
-        
-        // const buyresult = totalResult.filter(egg => egg[7] == 'Buy');
-        // console.log(buyresult.length);
-
-        // if logged in, filter the NotInterest
-        // if(req.headers.authorization){
-        //     let token = req.headers.authorization.split(" ")[1];
-        //     const user = await jwt.verify(token, process.env.JWT_SECRET);
-        //     User.findOne({ _id: user._id }).populate('notinterests').populate('bans').exec((err, user) => {
-        //         if(err) return res.status(400).json({ "message" : "err At getNotInterest"});;
-        //         if(user) {
-        //             console.log("notInterest at stockController");
-        //             let notInts = user.notinterests;
-        //             let bans = user.bans;
-        //             let notIntElement = notInts.map((el) => {
-        //                 return {ticker: el.ticker, company: el.company}
-        //             });
-        //             let bansElement = bans.map((el) => {
-        //                 return {ticker: el.ticker, company: el.company}
-        //             })
-        //             let totalexclude = notIntElement.concat(bansElement);
-        //             totalexclude.forEach((el) => {
-        //                 buyresult.forEach((th) => {
-        //                     while(true) {
-        //                         let idx = buyresult.indexOf(th);
-        //                         if(el.ticker == th[0] && el.company == th[2] && idx > -1) {
-        //                             buyresult.splice(idx, 1);
-        //                         } else {
-        //                             break;
-        //                         }
-        //                     }
-        //                 });
-        //             })
-        //         }
-        //         console.log(buyresult.length);
-        //         // return res.status(200).json({ buyresult });
-        //     })
-        // }
     } catch(err) {
-        console.log(err)
+        console.log(err);
     }
 }
 
-collectData();
+// collectData();
 
 let getData = async(page, today, pageNum = 1, totalList = []) => {
     try {
@@ -226,7 +141,6 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
             }, changedUrl);
             
             await page.waitForTimeout(2000);
-            
         };        
      
         const trTag = '#wrapper > div > table > tbody > tr';
@@ -254,7 +168,7 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
         let dateDifference = diffDate(today, lastDataDate);
         console.log(`Date Diff: ${dateDifference}`);
 
-        if(dateDifference < 3) {
+        if(dateDifference < 7) {
             let nextpage = pageNum + 1;
             return await getData(page, today, nextpage, resultArray);
         } else {

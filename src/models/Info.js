@@ -18,6 +18,7 @@ const infoSchema = new mongoose.Schema({
     DividendYield: String,
     PERatio: String,
     MarketCap: String,
+    createdAt: { type: Date, default: Date.now }
 });
 
 const model = mongoose.model('Info', infoSchema);
