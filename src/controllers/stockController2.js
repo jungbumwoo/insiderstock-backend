@@ -54,6 +54,7 @@ export const getAllStock = (req, res) => {
                             return {ticker: el.ticker, company: el.company}
                         })
                         let totalexclude = notIntElement.concat(bansElement);
+                        
                         totalexclude.forEach((el) => {
                             buyresult.forEach((th) => {
                                 while(true) {

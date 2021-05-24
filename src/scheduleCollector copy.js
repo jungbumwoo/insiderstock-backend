@@ -4,9 +4,9 @@ import schedule from "node-schedule";
 import Info from "./models/Info.js";
 
 
-// schedule.scheduleJob('58 * * * *', () => {
-//     collectData();
-// });
+schedule.scheduleJob('58 * * * *', () => {
+    collectData();
+});
 
 const collectData = async() => {
     console.log('what the what!!');
@@ -39,133 +39,59 @@ const collectData = async() => {
             return {
                 ticker: el[0],
                 company: el[2],
-                currentprice: el[3],
+                currentprice: parseFloat(el[3].replace(/(\$|,)/g, '')),
                 insiderName: el[4],
                 insiderPosition: el[5],
                 date: el[6],
-                transcation: el[7],
-                insiderTradingShares: el[8],
-                sharesChange: el[9],
-                purchasePrice: el[10],
-                cost: el[11],
-                finalShare: el[12],
-                priceChangeSIT: el[13],
-                DividendYield: el[14],
-                PERatio: el[15],
-                MarketCap: el[16]
+                buyOrSell:el[7],
+                insiderTradingShares: parseInt(el[8].replace(/,/g, "")),
+                sharesChange: parseFloat(el[9].replace('%', '') ),
+                purchasePrice: parseFloat(el[10].replace(/(\$|,)/g, '')),
+                cost: parseFloat(el[11].replace(/(\$|,)/g, '')),
+                finalShare: parseInt(el[12].replace(/,/g, "")),
+                priceChangeSIT: parseFloat(el[13].replace('%', '')),
+                DividendYield: parseFloat(el[14].replace('%', '')),
+                PERatio: parseFloat(el[15].replace('%', '')),
+                MarketCap: parseFloat(el[16].replace(/,/g, ""))
             }
-        });
-
-        let briefResult = totalResultObject.map((item) => {
-            return {
-                ticker: item.ticker,
-                insiderName: item.insiderName,
-                date: item.date,
-                transcation: item.transcation,
-                cost: item.cost,
-                insiderTradingShares: item.insiderTradingShares
-            };
         });
 
         let exsistInfo = await Info.find({}).exec()
         .then((info) => {
-            if(info){
-                // console.log(info.length);
-                // console.log("info[0]");
+            if(info) {
                 console.log("info");
-                // let duplications = [];
-                // totalResultObject.forEach((item) => {
-                //     // console.log(info[0]);
-                //     // console.log(item[0]);
-                //     if (info.indexOf(item) === -1){
-                //         duplications.push(item);
-                //     }
-                // })
+                console.log(info.length);
+                console.log("info[0]");
+                console.log(info[0]);
 
-                let briefInfo = info.map((item) => {
-                    let reformDate = reformDataType(item.date);
-                    return {
-                        ticker: item.ticker,
-                        insiderName: item.insiderName,
-                        date: reformDate,
-                        transcation: item.transcation,
-                        cost: item.cost,
-                        insiderTradingShares: item.insiderTradingShares
+                console.log("totalResultObject[0]");
+                console.log(totalResultObject[0]);
+                console.log(totalResultObject.length);
+                let duplications = [];
+                info.forEach((item) => {
+                    item.currentprice = parseFloat(item.currentprice.toString());
+                })
+                console.log("info[0]");
+                console.log(info[0]);
+                totalResultObject.forEach((item) => {
+                    if (info.indexOf(item) === -1){
+                        duplications.push(item);
                     }
                 })
-                console.log("briefResult.length");
-                console.log(briefResult.length);
-                console.log("briefInfo");
-                console.log(briefInfo.length);
-                // 1.
-                let briefDuplicate = briefResult.slice();
-                briefDuplicate.forEach((item) => {
-                    let i = 0;
-                    while(i < briefInfo.length) {
-                        if(JSON.stringify(item) == JSON.stringify(briefInfo[i])) {
-                            //delete
-                            let index = briefResult.indexOf(item);
-                            briefResult.splice(index, 1);
-                            break;
-                        } 
-                        i++;
-                    }
-                    // briefInfo.forEach((el) => {
-                    //     let json_item = JSON.stringify(item);
-                    //     let json_el = JSON.stringify(el);
-                    //     if(json_item == json_el) {
-                    //         let deleteIndex = briefResult.indexOf(item);
-                    //         briefResult.splice(deleteIndex, 1);
-                    //     }
-                    // })
-                })
-                console.log("briefResult.length")
-                console.log(briefResult.length);
-                let a = [1, 2, 3, 4, 5, 6, 7];
-                let b = [1, 2, 3, 4];
-                let c = a.slice();
-
-                c.forEach((item) => {
-                    let i = 0;
-                    while(i < b.length) {
-                        console.log("item, b[]");
-                        console.log(item, b[i]);
-                        if (b[i] == item) {
-                            let index = a.indexOf(item);
-                            a.splice(index, 1);
-                            break;
-                        }
-                        i++;
-                    }
-                    // b.forEach((el) => {
-                    //     console.log("item, el");
-                    //     console.log(item, el);
-                    //     let jsonitem = JSON.stringify(item);
-                    //     let jsonel = JSON.stringify(el);
-                    //     if (jsonitem == jsonel) {
-                    //         console.log(`delete ${a.indexOf(item)}`);
-                    //         let index = a.indexOf(item);
-                    //         a.splice(index, 1);
-                    //     }
-                    // })
-                })
-                console.log("a");
-                console.log(a);
-                return briefResult;
-                // 2.
-                // briefResult.forEach((item) => {
-                //     let index = briefInfo.indexOf(item);
-                //     console.log(index);
-                // })
+                console.log("duplications at exec");
+                console.log(duplications.length);
+                console.log(duplications[0]);
+                return duplications;
             }
         })
-        .then((briefResult) => {
-            Info.create(briefResult);
-            return;
+        .then((duplications) => {
+            console.log("duplications.length");
+            console.log(duplications.length);
+            // Info.create(duplications);
         })
         
-        // const buyresult = totalResult.filter(egg => egg[7] == 'Buy');
-        // console.log(buyresult.length);
+        const buyresult = totalResult.filter(egg => egg[7] == 'Buy');
+        console.log(buyresult.length);
 
         // if logged in, filter the NotInterest
         // if(req.headers.authorization){
@@ -205,8 +131,6 @@ const collectData = async() => {
         console.log(err)
     }
 }
-
-collectData();
 
 let getData = async(page, today, pageNum = 1, totalList = []) => {
     try {
@@ -288,13 +212,4 @@ const diffDate = (day1, day2) => {
         console.log(`Last Data Date: ${date2}`);
     }
     return diff;
-}
-
-const reformDataType = (date) => {
-    let year = date.getFullYear();
-    let month = (1 + date.getMonth());
-    month = month >= 10 ? month : '0' + month;
-    let day = date.getDate();
-    day = day >= 10 ? day : '0' + day;
-    return year + '-' + month + '-' + day; 
 }
