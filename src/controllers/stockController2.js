@@ -2,80 +2,66 @@ import puppeteer from "puppeteer";
 import User from "../models/User.js";
 import Interest from "../models/Interest.js";
 import Notinterest from "../models/Notinterest.js";
+import Info from "../models/Info.js";
 import jwt from "jsonwebtoken";
 
 // 첫 페이지 뜨는 거 읽은 다음에 다음 페이지는 상황을 봐가며 읽던가 멈추던가 하는 방법이 있고
 // 아에 처음부터 페이지를 돌리는데 상황을 보고 멈추는 방법도 있고.
 
-export const getAllStock = (req, res) => {
-    (async () => {
-        try {
-            console.log("getAllStock Func executed");
-            const browser = await puppeteer.launch();
-            const page = await browser.newPage();
-            await page.goto('https://www.gurufocus.com/forum/login.php?0');
-            
-            // Login
-            await page.waitForSelector('#txt-username');
-            await page.type('#txt-username', process.env.GURU_ID);
-            await page.type('#txt-password', process.env.GURU_PASSWORD);
-
-            //submit
-            await page.click('#login_form > div > table > tbody > tr:nth-child(3) > td > input');
-            console.log("Login GURU submit");
-            await page.waitForSelector('#menu > li:nth-child(5) > div > div > ul > li:nth-child(1) > a');
-            await page.evaluate(() => document.querySelector('#menu > li:nth-child(5) > div > div > ul > li:nth-child(1) > a').click());
-            await page.waitForNavigation();
-            let today = getToday();
-
-            //GET DATA
-            let totalResult = await getData(page, today);
-
-            //filter (Only for Buy Data)
-            const buyresult = totalResult.filter(egg => egg[7] == 'Buy');
-            console.log(buyresult[0]);
-            console.log(buyresult.length);
-            await browser.close();
-
-            // if logged in, filter the NotInterest
-            if(req.headers.authorization){
-                let token = req.headers.authorization.split(" ")[1];
-                const user = await jwt.verify(token, process.env.JWT_SECRET);
-                User.findOne({ _id: user._id }).populate('notinterests').populate('bans').exec((err, user) => {
-                    if(err) return res.status(400).json({ "message" : "err At getNotInterest"});;
-                    if(user) {
-                        console.log("notInterest at stockController");
-                        let notInts = user.notinterests;
-                        let bans = user.bans;
-                        let notIntElement = notInts.map((el) => {
-                            return {ticker: el.ticker, company: el.company}
-                        });
-                        let bansElement = bans.map((el) => {
-                            return {ticker: el.ticker, company: el.company}
-                        })
-                        let totalexclude = notIntElement.concat(bansElement);
-                        
-                        totalexclude.forEach((el) => {
-                            buyresult.forEach((th) => {
-                                while(true) {
-                                    let idx = buyresult.indexOf(th);
-                                    if(el.ticker == th[0] && el.company == th[2] && idx > -1) {
-                                        buyresult.splice(idx, 1);
-                                    } else {
-                                        break;
-                                    }
-                                }
-                            });
-                        })
-                    }
-                    console.log(buyresult.length);
-                    return res.status(200).json({ buyresult });
-                })
-            }
-        } catch(err) {
-            console.log(err)
+export const getAllStock = async(req, res) => {
+    try {
+        // if logged in, filter the NotInterest
+        if(req.headers.authorization){
+            let token = req.headers.authorization.split(" ")[1];
+            const user = await jwt.verify(token, process.env.JWT_SECRET);
+            await Info.find({ transcation: "Buy"})
+            .exec((err, infos) => {
+                console.log("infos at getAllStock");
+                console.log(infos.length);
+                return res.status(200).json({ result: infos });
+            })
+            // await User.findOne({ _id: user._id }).populate('notinterests').populate('bans').exec((err, user) => {
+            //     if(err) return res.status(400).json({ "message" : "err At getNotInterest"});;
+            //     if(user) {
+            //         console.log("notInterest at stockController");
+            //         let notInts = user.notinterests;
+            //         let bans = user.bans;
+            //         let notIntElement = notInts.map((el) => {
+            //             return {ticker: el.ticker, company: el.company}
+            //         });
+            //         let bansElement = bans.map((el) => {
+            //             return {ticker: el.ticker, company: el.company}
+            //         })
+            //         let totalexclude = notIntElement.concat(bansElement);
+                    
+            //         totalexclude.forEach((el) => {
+            //             buyresult.forEach((th) => {
+            //                 while(true) {
+            //                     let idx = buyresult.indexOf(th);
+            //                     if(el.ticker == th[0] && el.company == th[2] && idx > -1) {
+            //                         buyresult.splice(idx, 1);
+            //                     } else {
+            //                         break;
+            //                     }
+            //                 }
+            //             });
+            //         })
+            //     }
+            //     console.log(buyresult.length);
+            //     return res.status(200).json({ buyresult });
+            // })
+        } else {
+            //withOut Logged In
+            await Info.find({ transcation: "Buy"})
+            .exec((err, infos) => {
+                console.log("infos at getAllStock");
+                console.log(infos.length);
+                return res.status(200).json({ result: infos})
+            })
         }
-    })();
+    } catch(err) {
+        console.log(err)
+    }
 }
 
 let getData = async(page, today, pageNum = 1, totalList = []) => {

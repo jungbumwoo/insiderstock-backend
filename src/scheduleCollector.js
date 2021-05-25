@@ -4,7 +4,7 @@ import schedule from "node-schedule";
 import Info from "./models/Info.js";
 
 
-schedule.scheduleJob('58 * * * *', () => {
+schedule.scheduleJob('00 * * * *', () => {
     collectData();
 });
 
@@ -80,11 +80,11 @@ const collectData = async() => {
                         cost: item.cost,
                         insiderTradingShares: item.insiderTradingShares
                     }
-                })
-                console.log("briefResult.length");
-                console.log(briefResult.length);
-                console.log("briefInfo");
-                console.log(briefInfo.length);
+                });
+
+                console.log(`${briefResult.length} were collected.(briefResult.length)`);
+
+                console.log(`${briefInfo.length} was in db. (briefInfo)`);
                 // 1.
                 let briefDuplicate = briefResult.slice();
                 briefDuplicate.forEach((item) => {
@@ -99,8 +99,7 @@ const collectData = async() => {
                         i++;
                     }     
                 })
-                console.log("briefResult.length")
-                console.log(briefResult.length);
+                console.log(`${briefResult.length} is new. (briefResult.length)`);
 
                 let newAddData = briefResult.map((item) => {
                     let indexNum = briefDuplicate.indexOf(item);
@@ -168,7 +167,7 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
         let dateDifference = diffDate(today, lastDataDate);
         console.log(`Date Diff: ${dateDifference}`);
 
-        if(dateDifference < 7) {
+        if(dateDifference < 6) {
             let nextpage = pageNum + 1;
             return await getData(page, today, nextpage, resultArray);
         } else {
