@@ -26,7 +26,7 @@ export const postAddBan = async(req, res) => {
             return {
                 ticker: item[0],
                 company: item[2],
-                DividendYield: item[14],
+                // DividendYield: item[14],
                 PERatio: item[15],
                 MarketCap: item[16]
             }

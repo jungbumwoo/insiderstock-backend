@@ -50,7 +50,7 @@ const collectData = async() => {
                 cost: parseFloat(el[11].replace(/(\$|,)/g, '')),
                 finalShare: parseInt(el[12].replace(/,/g, "")),
                 priceChangeSIT: parseFloat(el[13].replace('%', '')),
-                DividendYield: parseFloat(el[14].replace('%', '')),
+                // DividendYield: parseFloat(el[14].replace('%', '')),
                 PERatio: parseFloat(el[15].replace('%', '')),
                 MarketCap: parseFloat(el[16].replace(/,/g, ""))
             }

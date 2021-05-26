@@ -39,7 +39,7 @@ const collectData = async() => {
             return {
                 ticker: el[0],
                 company: el[2],
-                currentprice: el[3],
+                // currentprice: el[3],
                 insiderName: el[4],
                 insiderPosition: el[5],
                 date: el[6],

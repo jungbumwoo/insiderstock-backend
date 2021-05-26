@@ -56,7 +56,7 @@ export const getAllStock = async(req, res) => {
             .exec((err, infos) => {
                 console.log("infos at getAllStock");
                 console.log(infos.length);
-                return res.status(200).json({ result: infos})
+                return res.status(200).json({ result: infos});
             })
         }
     } catch(err) {

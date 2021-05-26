@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 const infoSchema = new mongoose.Schema({
     ticker: String,
     company: String,
-    currentprice: String,
     insiderName: String,
     insiderPosition: String,
     date: { type: Date },
@@ -15,7 +14,7 @@ const infoSchema = new mongoose.Schema({
     finalShare: String,
     // price change since insider trade
     priceChangeSIT: { type: String },
-    DividendYield: String,
+    // DividendYield: String,
     PERatio: String,
     MarketCap: String,
     createdAt: { type: Date, default: Date.now }
