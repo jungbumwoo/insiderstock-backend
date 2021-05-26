@@ -5,6 +5,9 @@ import Notinterest from "../models/Notinterest.js";
 import Info from "../models/Info.js";
 import jwt from "jsonwebtoken";
 
+import { paginate, pagedArray } from "../utils/pagination.js";
+
+
 // 첫 페이지 뜨는 거 읽은 다음에 다음 페이지는 상황을 봐가며 읽던가 멈추던가 하는 방법이 있고
 // 아에 처음부터 페이지를 돌리는데 상황을 보고 멈추는 방법도 있고.
 
@@ -18,8 +21,17 @@ export const getAllStock = async(req, res) => {
             .exec((err, infos) => {
                 console.log("infos at getAllStock");
                 console.log(infos.length);
+
+                // transform for pagination
+                let paginatedResult = pagedArray(infos, req.query.page);
+                console.log("paginatedResult[0]");
+                console.log(paginatedResult[0]);
                 return res.status(200).json({ result: infos });
-            })
+            });
+
+
+
+
             // await User.findOne({ _id: user._id }).populate('notinterests').populate('bans').exec((err, user) => {
             //     if(err) return res.status(400).json({ "message" : "err At getNotInterest"});;
             //     if(user) {
