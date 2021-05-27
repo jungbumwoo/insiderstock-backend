@@ -19,14 +19,20 @@ export const getAllStock = async(req, res) => {
             const user = await jwt.verify(token, process.env.JWT_SECRET);
             await Info.find({ transcation: "Buy"})
             .exec((err, infos) => {
-                console.log("infos at getAllStock");
+                console.log("infos at getAllStock!");
                 console.log(infos.length);
+                let infosIdChanged = infos.map((item) => {
+                    item._id = infos.indexOf(item) + 1;
+                    return item
+                })
+                console.log(infosIdChanged[0]);
 
+                console.log("req.query");
+                console.log(req.query);
                 // transform for pagination
                 let paginatedResult = pagedArray(infos, req.query.page);
-                console.log("paginatedResult[0]");
-                console.log(paginatedResult[0]);
-                return res.status(200).json({ result: infos });
+                
+                return res.status(200).json(paginatedResult);
             });
 
 
@@ -66,9 +72,20 @@ export const getAllStock = async(req, res) => {
             //withOut Logged In
             await Info.find({ transcation: "Buy"})
             .exec((err, infos) => {
-                console.log("infos at getAllStock");
+                console.log("infos at getAllStock!");
                 console.log(infos.length);
-                return res.status(200).json({ result: infos});
+
+                console.log("req.query");
+                console.log(req.query);
+                let infosIdChanged = infos.map((item) => {
+                    item.num = infos.indexOf(item) + 1;
+                    return item
+                })
+                console.log(infosIdChanged[0]);
+                // transform for pagination
+                let paginatedResult = pagedArray(infos, req.query.page);
+                
+                return res.status(200).json({paginatedResult});
             })
         }
     } catch(err) {

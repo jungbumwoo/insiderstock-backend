@@ -12,7 +12,7 @@ export const requireSignin = async(req, res, next) => {
         }
     } catch(Err) {
         console.log(Err);
-        return res.status(400).json({ "message" : Err });
+        return res.status(400).json({ "message" : "Login Error" });
     }
     next();
 }

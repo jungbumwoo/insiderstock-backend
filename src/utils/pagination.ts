@@ -40,9 +40,7 @@ export const paginate = (
     let endIndex = Math.min(startIndex + pageSize -1, totalItems -1);
 
     // create an array of pages to ng-repeat in the pager control
-    let pages = Array.from(Array((endPage +1) - startPage).keys()).map(i => startPage + 1);
-    console.log("pages at pagination");
-    console.log(pages);
+    let pages = Array.from(Array((endPage +1) - startPage).keys()).map(i => startPage + i);
 
     // return object with all pager properties  required by the view.
     return { 
@@ -59,20 +57,23 @@ export const paginate = (
 };
 // export = paginate;
 
-//
-export const pagedArray = (elements, query) => {
+export const pagedArray = (elements: any, query: any) => {
     // elements
-    const items = [...elements.keys()].map(i => ({ id: (i +1), name: 'Item' + ( i + 1) }));
+    // const items = [...Array(elements.length).keys()].map(i => ({ id: (i +1), name: 'Item' + ( i + 1) }));
+    const items = elements;
 
     // get page from query or default to first page
     const page = parseInt(query) || 1;
-    
+
     // get pager object for specified pages
-    const pageSize = 5;
+    const pageSize = 15;
     const pager = paginate(items.length, page, pageSize);
 
     // get page of items from items array
     const pageOfItems = items.slice(pager.startIndex, pager.endIndex + 1);
+    console.log(pageOfItems[0]);
+    console.log("pager");
+    console.log(pager);
 
     // return pager object and current page of items
     return { pager, pageOfItems};
