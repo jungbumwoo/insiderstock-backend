@@ -19,79 +19,35 @@ export const getAllStock = async(req, res) => {
             const user = await jwt.verify(token, process.env.JWT_SECRET);
             await Info.find({ transcation: "Buy"})
             .exec((err, infos) => {
+                console.log(infos);
                 console.log("infos at getAllStock!");
                 console.log(infos.length);
-                let infosIdChanged = infos.map((item) => {
-                    item._id = infos.indexOf(item) + 1;
-                    return item
+                let changedInfo = infos.map((item) => {
+                    return {...item, num: 1}
                 })
-                console.log(infosIdChanged[0]);
-
                 console.log("req.query");
                 console.log(req.query);
                 // transform for pagination
                 let paginatedResult = pagedArray(infos, req.query.page);
                 
                 return res.status(200).json(paginatedResult);
-            });
-
-
-
-
-            // await User.findOne({ _id: user._id }).populate('notinterests').populate('bans').exec((err, user) => {
-            //     if(err) return res.status(400).json({ "message" : "err At getNotInterest"});;
-            //     if(user) {
-            //         console.log("notInterest at stockController");
-            //         let notInts = user.notinterests;
-            //         let bans = user.bans;
-            //         let notIntElement = notInts.map((el) => {
-            //             return {ticker: el.ticker, company: el.company}
-            //         });
-            //         let bansElement = bans.map((el) => {
-            //             return {ticker: el.ticker, company: el.company}
-            //         })
-            //         let totalexclude = notIntElement.concat(bansElement);
-                    
-            //         totalexclude.forEach((el) => {
-            //             buyresult.forEach((th) => {
-            //                 while(true) {
-            //                     let idx = buyresult.indexOf(th);
-            //                     if(el.ticker == th[0] && el.company == th[2] && idx > -1) {
-            //                         buyresult.splice(idx, 1);
-            //                     } else {
-            //                         break;
-            //                     }
-            //                 }
-            //             });
-            //         })
-            //     }
-            //     console.log(buyresult.length);
-            //     return res.status(200).json({ buyresult });
-            // })
+            })
         } else {
             //withOut Logged In
-            await Info.find({ transcation: "Buy"})
-            .exec((err, infos) => {
-                console.log("infos at getAllStock!");
-                console.log(infos.length);
-
-                console.log("req.query");
-                console.log(req.query);
-                let infosIdChanged = infos.map((item) => {
-                    item.num = infos.indexOf(item) + 1;
-                    return item
-                })
-                console.log(infosIdChanged[0]);
-                // transform for pagination
-                let paginatedResult = pagedArray(infos, req.query.page);
-                
-                return res.status(200).json({paginatedResult});
+            let infos = await Info.find({ transcation: "Buy"}).exec();
+            console.log("infos at getAllStock! * without * Login");
+            console.log(infos.length);
+            infos.forEach((item) => {
+                item.num = infos.indexOf(item) + 1;
             })
+            // transform for pagination
+            let paginatedResult = pagedArray(infos, req.query.page);
+            return res.status(200).json({paginatedResult});
         }
     } catch(err) {
-        console.log(err)
-    }
-}
+        console.log(err);
+    };
+};
 
 let getData = async(page, today, pageNum = 1, totalList = []) => {
     try {
