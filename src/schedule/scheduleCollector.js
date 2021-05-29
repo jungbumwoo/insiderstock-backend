@@ -1,10 +1,14 @@
 import puppeteer from "puppeteer";
 import schedule from "node-schedule";
+import Info from "../models/Info.js";
+import Interest from "../models/Interest.js";
+import Onboard from "../models/Onboard.js";
 
-import Info from "./models/Info.js";
+import { deleteData } from "./deleteScheduler.js";
 
+deleteData();
 
-schedule.scheduleJob('58 * * * *', () => {
+schedule.scheduleJob('00 * * * *', () => {
     collectData();
 });
 
@@ -31,106 +35,112 @@ const collectData = async() => {
 
         //GET DATA
         let totalResult = await getData(page, today);
-
-        //filter (Only for Buy Data)
         await browser.close();
 
+        // make Data to object with key
         let totalResultObject = totalResult.map(el => {
             return {
                 ticker: el[0],
                 company: el[2],
-                currentprice: parseFloat(el[3].replace(/(\$|,)/g, '')),
+                // currentprice: el[3],
                 insiderName: el[4],
                 insiderPosition: el[5],
                 date: el[6],
-                buyOrSell:el[7],
-                insiderTradingShares: parseInt(el[8].replace(/,/g, "")),
-                sharesChange: parseFloat(el[9].replace('%', '') ),
-                purchasePrice: parseFloat(el[10].replace(/(\$|,)/g, '')),
-                cost: parseFloat(el[11].replace(/(\$|,)/g, '')),
-                finalShare: parseInt(el[12].replace(/,/g, "")),
-                priceChangeSIT: parseFloat(el[13].replace('%', '')),
-                // DividendYield: parseFloat(el[14].replace('%', '')),
-                PERatio: parseFloat(el[15].replace('%', '')),
-                MarketCap: parseFloat(el[16].replace(/,/g, ""))
+                transcation: el[7],
+                insiderTradingShares: el[8],
+                sharesChange: el[9],
+                purchasePrice: el[10],
+                cost: el[11],
+                finalShare: el[12],
+                priceChangeSIT: el[13],
+                DividendYield: el[14],
+                PERatio: el[15],
+                MarketCap: el[16]
             }
         });
 
+        // prepare for comparing with DB data
+        let briefResult = totalResultObject.map((item) => {
+            return {
+                ticker: item.ticker,
+                insiderName: item.insiderName,
+                date: item.date,
+                transcation: item.transcation,
+                cost: item.cost,
+                insiderTradingShares: item.insiderTradingShares
+            };
+        });
+
+        // Get DB data
         let exsistInfo = await Info.find({}).exec()
         .then((info) => {
-            if(info) {
-                console.log("info");
-                console.log(info.length);
-                console.log("info[0]");
-                console.log(info[0]);
-
-                console.log("totalResultObject[0]");
-                console.log(totalResultObject[0]);
-                console.log(totalResultObject.length);
-                let duplications = [];
-                info.forEach((item) => {
-                    item.currentprice = parseFloat(item.currentprice.toString());
-                })
-                console.log("info[0]");
-                console.log(info[0]);
-                totalResultObject.forEach((item) => {
-                    if (info.indexOf(item) === -1){
-                        duplications.push(item);
+            if(info){
+                //  reform for compare with New Data.
+                let briefInfo = info.map((item) => {
+                    let reformDate = reformDataType(item.date);
+                    return {
+                        ticker: item.ticker,
+                        insiderName: item.insiderName,
+                        date: reformDate,
+                        transcation: item.transcation,
+                        cost: item.cost,
+                        insiderTradingShares: item.insiderTradingShares
                     }
+                });
+                console.log(`${briefResult.length} were collected.(briefResult.length)`);
+                console.log(`${briefInfo.length} was in db. (briefInfo)`);
+
+                // Get All "Sell" Data from New
+                const briefSellResult = briefResult.filter(egg => egg.transcation == 'Sell');
+
+                // Get the specific Data from Sell
+                let allOnboards = Onboard.find({}).exec();
+                let allInterests = Interest.find({}).exec();
+
+                console.log("allOnboards[0]");
+                console.log(allOnboards[0]);
+                
+
+                // Get  * All * "Buy" Data from New Data
+                const briefBuyResult = briefResult.filter(egg => egg.transcation == 'Buy');
+                console.log(`briefBuyResult length: ${briefBuyResult.length}`);
+
+                // Delete the exsists Data from DB at New one.
+                let briefDuplicate = briefBuyResult.slice();
+                briefDuplicate.forEach((item) => {
+                    let i = 0;
+                    while(i < briefInfo.length) {
+                        if(JSON.stringify(item) == JSON.stringify(briefInfo[i])) {
+                            //delete
+                            let index = briefBuyResult.indexOf(item);
+                            briefBuyResult.splice(index, 1);
+                            break;
+                        };
+                        i++;
+                    }     
                 })
-                console.log("duplications at exec");
-                console.log(duplications.length);
-                console.log(duplications[0]);
-                return duplications;
+                console.log(`${briefBuyResult.length} is new. (briefBuyResult.length)`);
+
+                let newAddData = briefBuyResult.map((item) => {
+                    let indexNum = briefDuplicate.indexOf(item);
+                    return totalResultObject[indexNum];
+                })
+                return newAddData;
             }
         })
-        .then((duplications) => {
-            console.log("duplications.length");
-            console.log(duplications.length);
-            // Info.create(duplications);
+        .then((newAddData) => {
+            if(newAddData.length > 0) {
+                Info.create(newAddData);
+            }
+            console.log("✅ update succeeded");
+            return;
         })
-        
-        const buyresult = totalResult.filter(egg => egg[7] == 'Buy');
-        console.log(buyresult.length);
-
-        // if logged in, filter the NotInterest
-        // if(req.headers.authorization){
-        //     let token = req.headers.authorization.split(" ")[1];
-        //     const user = await jwt.verify(token, process.env.JWT_SECRET);
-        //     User.findOne({ _id: user._id }).populate('notinterests').populate('bans').exec((err, user) => {
-        //         if(err) return res.status(400).json({ "message" : "err At getNotInterest"});;
-        //         if(user) {
-        //             console.log("notInterest at stockController");
-        //             let notInts = user.notinterests;
-        //             let bans = user.bans;
-        //             let notIntElement = notInts.map((el) => {
-        //                 return {ticker: el.ticker, company: el.company}
-        //             });
-        //             let bansElement = bans.map((el) => {
-        //                 return {ticker: el.ticker, company: el.company}
-        //             })
-        //             let totalexclude = notIntElement.concat(bansElement);
-        //             totalexclude.forEach((el) => {
-        //                 buyresult.forEach((th) => {
-        //                     while(true) {
-        //                         let idx = buyresult.indexOf(th);
-        //                         if(el.ticker == th[0] && el.company == th[2] && idx > -1) {
-        //                             buyresult.splice(idx, 1);
-        //                         } else {
-        //                             break;
-        //                         }
-        //                     }
-        //                 });
-        //             })
-        //         }
-        //         console.log(buyresult.length);
-        //         // return res.status(200).json({ buyresult });
-        //     })
-        // }
     } catch(err) {
-        console.log(err)
+        console.log(err);
     }
 }
+
+// collectData();
 
 let getData = async(page, today, pageNum = 1, totalList = []) => {
     try {
@@ -150,7 +160,6 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
             }, changedUrl);
             
             await page.waitForTimeout(2000);
-            
         };        
      
         const trTag = '#wrapper > div > table > tbody > tr';
@@ -178,7 +187,7 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
         let dateDifference = diffDate(today, lastDataDate);
         console.log(`Date Diff: ${dateDifference}`);
 
-        if(dateDifference < 3) {
+        if(dateDifference < 6) {
             let nextpage = pageNum + 1;
             return await getData(page, today, nextpage, resultArray);
         } else {
@@ -212,4 +221,13 @@ const diffDate = (day1, day2) => {
         console.log(`Last Data Date: ${date2}`);
     }
     return diff;
+}
+
+const reformDataType = (date) => {
+    let year = date.getFullYear();
+    let month = (1 + date.getMonth());
+    month = month >= 10 ? month : '0' + month;
+    let day = date.getDate();
+    day = day >= 10 ? day : '0' + day;
+    return year + '-' + month + '-' + day; 
 }

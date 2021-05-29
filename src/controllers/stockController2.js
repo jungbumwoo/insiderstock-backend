@@ -19,27 +19,17 @@ export const getAllStock = async(req, res) => {
             const user = await jwt.verify(token, process.env.JWT_SECRET);
             await Info.find({ transcation: "Buy"})
             .exec((err, infos) => {
-                console.log(infos);
-                console.log("infos at getAllStock!");
-                console.log(infos.length);
-                let changedInfo = infos.map((item) => {
-                    return {...item, num: 1}
-                })
-                console.log("req.query");
-                console.log(req.query);
+                console.log("infos at getAllStock (Loged In)");
+                
                 // transform for pagination
                 let paginatedResult = pagedArray(infos, req.query.page);
-                
-                return res.status(200).json(paginatedResult);
+                return res.status(200).json({paginatedResult});
             })
         } else {
             //withOut Logged In
             let infos = await Info.find({ transcation: "Buy"}).exec();
             console.log("infos at getAllStock! * without * Login");
-            console.log(infos.length);
-            infos.forEach((item) => {
-                item.num = infos.indexOf(item) + 1;
-            })
+            
             // transform for pagination
             let paginatedResult = pagedArray(infos, req.query.page);
             return res.status(200).json({paginatedResult});

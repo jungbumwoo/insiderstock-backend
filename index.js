@@ -14,7 +14,7 @@ import banRouter from "./src/routers/banRouter";
 dotenv.config();
 import "./src/db.js";
 import "./src/passport.js";
-import "./src/scheduleCollector.js";
+import "./src/schedule/scheduleCollector.js";
 
 const app = express();
 const PORT = process.env.PORT;
