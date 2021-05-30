@@ -6,9 +6,10 @@ import Onboard from "../models/Onboard.js";
 
 import { deleteData } from "./deleteScheduler.js";
 
-deleteData();
 
-schedule.scheduleJob('00 * * * *', () => {
+
+schedule.scheduleJob('* 10 * * *', () => {
+    deleteData();
     collectData();
 });
 

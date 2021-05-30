@@ -5,7 +5,7 @@ import Notinterest from "../models/Notinterest.js";
 import Info from "../models/Info.js";
 import jwt from "jsonwebtoken";
 
-import { paginate, pagedArray } from "../utils/pagination.js";
+import { pagedArray } from "../utils/pagination.js";
 
 
 // 첫 페이지 뜨는 거 읽은 다음에 다음 페이지는 상황을 봐가며 읽던가 멈추던가 하는 방법이 있고
@@ -29,7 +29,7 @@ export const getAllStock = async(req, res) => {
             //withOut Logged In
             let infos = await Info.find({ transcation: "Buy"}).exec();
             console.log("infos at getAllStock! * without * Login");
-            
+
             // transform for pagination
             let paginatedResult = pagedArray(infos, req.query.page);
             return res.status(200).json({paginatedResult});
@@ -123,14 +123,21 @@ const diffDate = (day1, day2) => {
 
 export const addGetInterest = async(req, res) => {
     const { _id } = req.user;
+    console.log("addgetInterest");
     try {
         let userData = User.findOne({ _id })
         .exec(async(err, user) => {
             let userIntId = user.interests; 
             let interested = await Interest.find({ _id: userIntId });
-            return res.status(200).json({ interested });
+
+            let pagedResult = pagedArray(interested, req.query.page);
+            console.log("pagedResult");
+            console.log(pagedResult);
+
+            return res.status(200).json({ pagedResult });
         })
     } catch(err) {
+        console.log("err at addgetInterest");
         console.log(err);
         return res.status(400).json({ "message": err })
     }

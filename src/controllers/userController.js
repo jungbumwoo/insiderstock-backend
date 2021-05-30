@@ -77,8 +77,6 @@ export const postKakaoJsSignin = (req, res) => {
     .exec(async(error, user) => {
         if(error) return res.status(400).json({error});
         if(user) {
-            console.log("user at postKakaoJsSignin");
-            console.log(user);  
             const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d'});
             res.status(200).json({
                 token, nickname, profileImg110
