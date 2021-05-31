@@ -23,6 +23,7 @@ export const getAllStock = async(req, res) => {
                 
                 // transform for pagination
                 let paginatedResult = pagedArray(infos, req.query.page);
+                console.log(paginatedResult.pager.currentPage);
                 return res.status(200).json({paginatedResult});
             })
         } else {
@@ -32,6 +33,7 @@ export const getAllStock = async(req, res) => {
 
             // transform for pagination
             let paginatedResult = pagedArray(infos, req.query.page);
+            console.log(paginatedResult.pager.currentPage);
             return res.status(200).json({paginatedResult});
         }
     } catch(err) {

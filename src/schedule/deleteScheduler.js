@@ -11,9 +11,6 @@ export const deleteData = async() => {
         await Info.deleteMany({ transcation: /Sell/, createdAt: {$lte: dateBefore }}, (err, result) => {
             console.log(result);
         });
-
-        
-
         // await Info.find({}).exec((err, infos) => {
         //     let getDateDiff = (infoDate) => {
         //         let timeNow = new Date();
