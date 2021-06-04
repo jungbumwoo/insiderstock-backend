@@ -3,10 +3,10 @@ import mongoose from "mongoose";
 const onboardSchema = new mongoose.Schema({
     ticker: String,
     company: String,
-    marketCap: mongoose.Schema.Types.Decimal128,
-    price: mongoose.Schema.Types.Decimal128,
-    shares: Number,
-    cost: mongoose.Schema.Types.Decimal128,
+    MarketCap: String,
+    price: String,
+    shares: String,
+    cost: String,
     date: { type: Date },
 });
 

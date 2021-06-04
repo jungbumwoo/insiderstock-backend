@@ -1,5 +1,5 @@
 import express from "express";
-import {  addGetInterest,
+import {  getInterest,
     addPostInterest,
     deletePostInterest,
      getAllStock
@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.get('/stock', getAllStock);
 
-router.get('/addinterest', requireSignin, addGetInterest);
+router.get('/interest', requireSignin, getInterest);
 router.post('/addinterest', requireSignin, addPostInterest);
 
 router.post('/addnotinterest', requireSignin, addNotInterest);

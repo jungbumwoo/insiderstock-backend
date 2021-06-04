@@ -1,5 +1,6 @@
 import Notinterest from "../models/Notinterest.js";
 import User from "../models/User.js";
+import { pagedArray } from "../utils/pagination.js";
 
 export const addNotInterest = async(req, res) => {
     console.log("addNotPostInterest");
@@ -50,13 +51,13 @@ export const getNotInterest = async(req, res) => {
             if(err) return res.status(400).json({ "message" : "err At getNotInterest"});;
             if(user) {
                 let notInts = user.notinterests;
-                console.log("notInts");
-                console.log(notInts);
-                return res.status(200).json({ notInterests: notInts });
-            }
+                let pagedNotInt = pagedArray(notInts, req.query.page);
+                return res.status(200).json({ pagedNotInt });
+            };
         })
     } catch(err){
-        console.log(err)
+        console.log(err);
+        return res.status(400).json({ err });
     }
 }
 
@@ -69,11 +70,11 @@ export const postDeleteNotInt = async(req, res) => {
     })
     console.log(deleteDataID);
     try {
-        let result = await Notinterest.deleteMany({ _id : deleteDataID });
-        let result2 = await User.findOne({ _id })
+        await Notinterest.deleteMany({ _id : deleteDataID });
+        await User.findOne({ _id })
         .exec((err, user) => {
             deleteDataID.forEach((id) => {
-                let index = user.notinterests.index;
+                let index = user.notinterests.indexOf(id);
                 user.notinterests.splice(index, 1);
             })
             user.save((err, user) => {
@@ -81,8 +82,6 @@ export const postDeleteNotInt = async(req, res) => {
                 if (user) return res.status(201).json({ "messgae" : "Muyaho at DeletePost"});
             })
         });
-        console.log(result2);
-        console.log(result2);
     } catch(err) {
         console.log(err);
         return res.status(400).json({ "message" : "err at PostDeleteNotInt"});

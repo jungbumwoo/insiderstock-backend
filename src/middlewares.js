@@ -8,10 +8,11 @@ export const requireSignin = async(req, res, next) => {
             console.log("✅ user logged In");
             req.user = user;
         } else {
-            return res.status(400).json({ "message": 'Authorization Required at middlewares'});
+            return res.status(400).json({"message" : "Need to Login for this content"})
         }
-    } catch(Err) {
-        console.log(Err);
+    } catch(err) {
+        console.log(err);
+        console.log("err at Middleware");
         return res.status(400).json({ "message" : "Login Error at middlewares" });
     }
     next();

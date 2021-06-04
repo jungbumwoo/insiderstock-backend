@@ -6,19 +6,19 @@ const interestSchema = new mongoose.Schema({
     insiderName: String,
     insiderPosition: String,
     date: { type: Date },
-    buyOrSell: String,
+    transcation: String,
     insiderTradingShares: String,
     sharesChange: String,
     purchasePrice: String,
-    finalShare: Number,
+    finalShare: String,
     // price change since insider trade
-    priceChangeSIT: { type: mongoose.Schema.Types.Decimal128 },
-    // DividendYield: mongoose.Schema.Types.Decimal128,
-    PERatio: mongoose.Schema.Types.Decimal128,
-    MarketCap: mongoose.Schema.Types.Decimal128,
+    priceChangeSIT: String,
+    // DividendYield: String,
+    PERatio: String,
+    MarketCap: String,
     
     mydate: { type: Date },
-    myprice: mongoose.Schema.Types.Decimal128
+    myprice: String
 });
 
 const model = mongoose.model('Interest', interestSchema);

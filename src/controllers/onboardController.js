@@ -4,32 +4,33 @@ import User from "../models/User.js";
 export const postAddOnboard = async (req, res) => {
     const { onboardList} = req.body;
     const { _id } = req.user;
+
+    console.log(onboardList);
     // Object => Array
-    let arrayOnboard = Object.values(onboardList);
+    // let arrayOnboard = Object.values(onboardList);
 
     // Split the Array by stock
-    let onboardArray = [];
-    let arrayNum = arrayOnboard.length;
-    for(let i = 0; i < arrayNum/6; i++) {
-        let removed = arrayOnboard.splice(0, 6);
-        onboardArray.push(removed);
-    }
-    console.log(onboardArray);
+    // let onboardArray = [];
+    // let arrayNum = arrayOnboard.length;
+    // for(let i = 0; i < arrayNum/6; i++) {
+    //     let removed = arrayOnboard.splice(0, 6);
+    //     onboardArray.push(removed);
+    // }
 
     // transform to save
-    let onboardObj = onboardArray.map(el => {
-        return {
-            ticker: el[0],
-            company: el[1],
-            price: el[2],
-            shares: parseInt(el[3]),
-            cost: el[2] * parseInt(el[3]),
-            marketCap: parseFloat(el[5])
-        }
-    });
+    // let onboardObj = onboardArray.map(el => {
+    //     return {
+    //         ticker: el[0],
+    //         company: el[1],
+    //         price: el[2],
+    //         shares: parseInt(el[3]),
+    //         cost: el[2] * parseInt(el[3]),
+    //         marketCap: parseFloat(el[5])
+    //     }
+    // });
     // Save in MongoDB
     try {
-        let result = await Onboard.create(onboardObj);
+        let result = await Onboard.create(onboardList);
         let resultDBId = result.map((item) => {
             return item._id
         });
@@ -43,6 +44,8 @@ export const postAddOnboard = async (req, res) => {
                         user.onboards.push(id);
                     })
                     user.save((err, user) => {
+                        console.log("result at postAddOnboard");
+                        console.log(result);
                         return res.status(201).json({ result });
                     })
                 } else {

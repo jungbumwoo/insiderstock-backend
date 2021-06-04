@@ -65,6 +65,10 @@ const pagedArray = (elements, query) => {
     const pager = exports.paginate(items.length, page, pageSize);
     // get page of items from items array
     const pageOfItems = items.slice(pager.startIndex, pager.endIndex + 1);
+    // pageOfItems.forEach((element: any) => {
+    //     delete element._id
+    //     console.log(element);
+    // });
     // return pager object and current page of items
     return { pager, pageOfItems };
 };
