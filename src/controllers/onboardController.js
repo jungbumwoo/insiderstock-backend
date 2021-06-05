@@ -1,5 +1,6 @@
 import Onboard from "../models/Onboard.js";
 import User from "../models/User.js";
+import { pagedArray } from "../utils/pagination.js";
 
 export const postAddOnboard = async (req, res) => {
     const { onboardList} = req.body;
@@ -24,53 +25,32 @@ export const postAddOnboard = async (req, res) => {
         onboardItems[`${num}`][`${itemKey}`] = value;
     }) 
     console.log(`onboardItems`, onboardItems);
-    // Object => Array
-    // let arrayOnboard = Object.values(onboardList);
-
-    // Split the Array by stock
-    // let onboardArray = [];
-    // let arrayNum = arrayOnboard.length;
-    // for(let i = 0; i < arrayNum/6; i++) {
-    //     let removed = arrayOnboard.splice(0, 6);
-    //     onboardArray.push(removed);
-    // }
-
-    // transform to save
-    // let onboardObj = onboardArray.map(el => {
-    //     return {
-    //         ticker: el[0],
-    //         company: el[1],
-    //         price: el[2],
-    //         shares: parseInt(el[3]),
-    //         cost: el[2] * parseInt(el[3]),
-    //         marketCap: parseFloat(el[5])
-    //     }
-    // });
+    
     // Save in MongoDB
     try {
-        // let result = await Onboard.create(onboardList);
-        // let resultDBId = result.map((item) => {
-        //     return item._id
-        // });
+        let result = await Onboard.create(onboardItems);
+        let resultDBId = result.map((item) => {
+            return item._id
+        });
         
-        // if(_id) {
-        //     await User.findOne({ _id })
-        //     .exec((err, user) => {
-        //         if(err) return res.status(400).json({"message" : "authoriztion err"});
-        //         if(user) {
-        //             resultDBId.forEach((id) => {
-        //                 user.onboards.push(id);
-        //             })
-        //             user.save((err, user) => {
-        //                 console.log("result at postAddOnboard");
-        //                 console.log(result);
-        //                 return res.status(201).json({ result });
-        //             })
-        //         } else {
-        //             return res.status(400).json({"message" : "authoriztion err"});
-        //         }
-        //     })
-        // }
+        if(_id) {
+            await User.findOne({ _id })
+            .exec((err, user) => {
+                if(err) return res.status(400).json({"message" : "authoriztion err"});
+                if(user) {
+                    resultDBId.forEach((id) => {
+                        user.onboards.push(id);
+                    })
+                    user.save((err, user) => {
+                        console.log("result at postAddOnboard");
+                        console.log(result);
+                        return res.status(201).json({ result });
+                    })
+                } else {
+                    return res.status(400).json({"message" : "authoriztion err"});
+                }
+            })
+        }
     } catch(err) {
         console.log(err);
         res.status(400).json({ "message" : "error at postAddOnboard"});
@@ -85,7 +65,8 @@ export const getOnboard = (req, res) => {
             if(err) return res.status(400).json({ "message" : "Error!!"})
             if(user) {
                 let onboardList = user.onboards;
-                return res.status(200).json({ onboards: onboardList });
+                let pagedOnboard = pagedArray(onboardList, req.query.page);
+                return res.status(200).json({ pagedOnboard });
             }
         })
     } catch(err) {
