@@ -6,6 +6,24 @@ export const postAddOnboard = async (req, res) => {
     const { _id } = req.user;
 
     console.log(onboardList);
+
+    // {} => [{}, {}, {}, ... {}]
+    let onboardItems = [];
+    Object.entries(onboardList).forEach(([key, value]) => {
+        // 'num_onboard_key' => num, _, key
+        let splitItem = key.split('_');
+        let num = parseInt(splitItem[0]); // num
+        let itemKey = splitItem[2];  // key
+
+        // Generate {}.
+        if(!onboardItems[`${num}`]) {
+            onboardItems[`${num}`] = {};
+        }
+         
+        // Insert key and value in {}
+        onboardItems[`${num}`][`${itemKey}`] = value;
+    }) 
+    console.log(`onboardItems`, onboardItems);
     // Object => Array
     // let arrayOnboard = Object.values(onboardList);
 

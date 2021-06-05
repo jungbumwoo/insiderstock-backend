@@ -7,7 +7,7 @@ const onboardSchema = new mongoose.Schema({
     price: String,
     shares: String,
     cost: String,
-    date: { type: Date },
+    date: { type: Date , default: Date.now()},
 });
 
 const model = mongoose.model('Onboard', onboardSchema);
