@@ -30,29 +30,29 @@ export const postAddOnboard = async (req, res) => {
     // });
     // Save in MongoDB
     try {
-        let result = await Onboard.create(onboardList);
-        let resultDBId = result.map((item) => {
-            return item._id
-        });
+        // let result = await Onboard.create(onboardList);
+        // let resultDBId = result.map((item) => {
+        //     return item._id
+        // });
         
-        if(_id) {
-            await User.findOne({ _id })
-            .exec((err, user) => {
-                if(err) return res.status(400).json({"message" : "authoriztion err"});
-                if(user) {
-                    resultDBId.forEach((id) => {
-                        user.onboards.push(id);
-                    })
-                    user.save((err, user) => {
-                        console.log("result at postAddOnboard");
-                        console.log(result);
-                        return res.status(201).json({ result });
-                    })
-                } else {
-                    return res.status(400).json({"message" : "authoriztion err"});
-                }
-            })
-        }
+        // if(_id) {
+        //     await User.findOne({ _id })
+        //     .exec((err, user) => {
+        //         if(err) return res.status(400).json({"message" : "authoriztion err"});
+        //         if(user) {
+        //             resultDBId.forEach((id) => {
+        //                 user.onboards.push(id);
+        //             })
+        //             user.save((err, user) => {
+        //                 console.log("result at postAddOnboard");
+        //                 console.log(result);
+        //                 return res.status(201).json({ result });
+        //             })
+        //         } else {
+        //             return res.status(400).json({"message" : "authoriztion err"});
+        //         }
+        //     })
+        // }
     } catch(err) {
         console.log(err);
         res.status(400).json({ "message" : "error at postAddOnboard"});
