@@ -74,3 +74,26 @@ export const getOnboard = (req, res) => {
         return res.status(400).json({ "message" : "getOnboard Err"});
     }
 };
+
+export const deleteOnboard = async(req, res) => {
+    const { onboards } = req.body;
+    const { _id } = req.user;
+    const deleteDataId = onboards.map(item => item._id);
+    try {
+        await Onboard.deleteMany({ _id: deleteDataId});
+        await User.findOne({ _id })
+        .exec((err, user) => {
+            deleteDataId.forEach(id =>{
+                let index = user.onboards.indexOf(id);
+                user.onboards.splice(index, 1);
+            })
+            user.save((err, user) => {
+                if (err) return res.status(400).json({"message" : "err at PostDelete"});
+                if (user) return res.status(201).json({ "message" : "Muyaho at deleteOnboard"});
+            })
+        })
+    } catch(err) {
+        console.log(err);
+        return res.status(400).json({ "message" : "err at DeleteOnboard"});
+    }
+}

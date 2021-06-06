@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import Ban from "../models/Ban.js";
+import { pagedArray } from '../utils/pagination.js';
 
 export const getBan = async(req, res) => {
     console.log("getBan");
@@ -9,7 +10,8 @@ export const getBan = async(req, res) => {
             if(err) return res.status(400).json({ "message" : "Err at getBan"});
             if(user) {
                 let bans = user.bans;
-                return res.status(200).json({ ban: bans})
+                let pagedBans = pagedArray(bans, req.query.page);
+                return res.status(200).json({ data :pagedBans });
             }
         })
     } catch(err) {
@@ -21,16 +23,16 @@ export const getBan = async(req, res) => {
 export const postAddBan = async(req, res) => {
     const { _id } =  req.user;
     const { bandata } =  req.body;
+    
+    // Document baned Date
+    const banData = bandata.map((item) => {
+        const nowDate = Date.now();
+        const today = new Date(nowDate);
+        item.createdAt = today.toISOString();
+        return item
+    });
+
     try {
-        let banData = bandata.map((item) => {
-            return {
-                ticker: item[0],
-                company: item[2],
-                // DividendYield: item[14],
-                PERatio: item[15],
-                MarketCap: item[16]
-            }
-        });
         let result = await Ban.create(banData);
         let resultDBId = result.map((item) => {
             return item._id
@@ -58,3 +60,19 @@ export const postAddBan = async(req, res) => {
     }
 }
 
+export const deleteBan = async(req, res) => {
+    const { deleteData } = req.body;
+    const { _id } = req.user;
+    console.log(`delteData`, delteData);
+    return;
+    try {
+        await Ban.deleteMany({ _id });
+        await User.findOne({ _id })
+        .exec((err, user) => {
+            if (err) return  res.status(400).json({ "message" : "err at deleteBan"});
+            
+        })
+    } catch(err) {
+        console.log(err)
+    }
+}
