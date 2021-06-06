@@ -63,14 +63,27 @@ export const postAddBan = async(req, res) => {
 export const deleteBan = async(req, res) => {
     const { deleteData } = req.body;
     const { _id } = req.user;
-    console.log(`delteData`, delteData);
-    return;
+    console.log(`deleteData`, deleteData);
+    const deleteIds = deleteData.map(item => item._id);
+    console.log(`deleteIds`, deleteIds);
     try {
-        await Ban.deleteMany({ _id });
+        await Ban.deleteMany({ _id: deleteIds })
+        .exec((err, result) => {
+            console.log(`Ban Delete result`, result);
+        })
         await User.findOne({ _id })
         .exec((err, user) => {
             if (err) return  res.status(400).json({ "message" : "err at deleteBan"});
-            
+            if (user) {
+                deleteIds.forEach(id => {
+                    let index = deleteIds.indexOf(id);
+                    user.bans.splice(index, 1);
+                })
+                user.save((err, user) => {
+                    if (err) return res.status(400).json({ "message": "err at deleteBan"})
+                    if (user) return res.status(201).json({ "message": "Keep Eyes on You, Hacker!!"});
+                })
+            }
         })
     } catch(err) {
         console.log(err)
