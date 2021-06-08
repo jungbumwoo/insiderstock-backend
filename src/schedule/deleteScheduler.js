@@ -8,7 +8,7 @@ export const deleteData = async() => {
         console.log(dateBefore);
         console.log(typeof dateBefore);
 
-        await Info.deleteMany({ transcation: /Sell/, createdAt: {$lte: dateBefore }}, (err, result) => {
+        await Info.deleteMany({ transaction: /Sell/, createdAt: {$lte: dateBefore }}, (err, result) => {
             console.log(result);
         });
         // await Info.find({}).exec((err, infos) => {
@@ -26,7 +26,7 @@ export const deleteData = async() => {
         //     console.log("filterOld[0]");
         //     console.log(filterOld[0]);
 
-        //     const sellData = filterOld.filter(egg => egg.transcation == 'Sell');
+        //     const sellData = filterOld.filter(egg => egg.transaction == 'Sell');
         //     console.log("sellData.length");
         //     console.log(sellData.length);
         //     console.log("sellData[0]");

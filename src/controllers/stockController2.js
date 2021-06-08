@@ -15,7 +15,7 @@ export const getAllStock = async(req, res) => {
         if(req.headers.authorization){
             let token = req.headers.authorization.split(" ")[1];
             const user = await jwt.verify(token, process.env.JWT_SECRET);
-            await Info.find({ transcation: "Buy"})
+            await Info.find({ transaction: "Buy"})
             .exec((err, infos) => {
                 // transform for pagination
                 let paginatedResult = pagedArray(infos, req.query.page);
@@ -24,7 +24,7 @@ export const getAllStock = async(req, res) => {
             })
         } else {
             //withOut Logged In
-            let infos = await Info.find({ transcation: "Buy"}).exec();
+            let infos = await Info.find({ transaction: "Buy"}).exec();
             console.log("infos at getAllStock! * without * Login");
 
             // transform for pagination

@@ -6,7 +6,7 @@ const infoSchema = new mongoose.Schema({
     insiderName: String,
     insiderPosition: String,
     date: { type: Date },
-    transcation: String,
+    transaction: String,
     insiderTradingShares: String,
     sharesChange: String,
     purchasePrice: String,

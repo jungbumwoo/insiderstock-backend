@@ -6,9 +6,7 @@ import Onboard from "../models/Onboard.js";
 
 import { deleteData } from "./deleteScheduler.js";
 
-
-
-schedule.scheduleJob('* 10 * * *', () => {
+schedule.scheduleJob('* * 10 * * *', () => {
     deleteData();
     collectData();
 });
@@ -47,7 +45,7 @@ const collectData = async() => {
                 insiderName: el[4],
                 insiderPosition: el[5],
                 date: el[6],
-                transcation: el[7],
+                transaction: el[7],
                 insiderTradingShares: el[8],
                 sharesChange: el[9],
                 purchasePrice: el[10],
@@ -61,12 +59,13 @@ const collectData = async() => {
         });
 
         // prepare for comparing with DB data
-        let briefResult = totalResultObject.map((item) => {
+        let briefGetData = totalResultObject.map((item) => {
             return {
                 ticker: item.ticker,
+                company: item.company,
                 insiderName: item.insiderName,
                 date: item.date,
-                transcation: item.transcation,
+                transaction: item.transaction,
                 cost: item.cost,
                 insiderTradingShares: item.insiderTradingShares
             };
@@ -74,66 +73,117 @@ const collectData = async() => {
 
         // Get DB data
         let exsistInfo = await Info.find({}).exec()
-        .then((info) => {
+        .then(async(info) => {
             if(info){
                 //  reform for compare with New Data.
                 let briefInfo = info.map((item) => {
                     let reformDate = reformDataType(item.date);
                     return {
                         ticker: item.ticker,
+                        company: item.company,
                         insiderName: item.insiderName,
                         date: reformDate,
-                        transcation: item.transcation,
+                        transaction: item.transaction,
                         cost: item.cost,
                         insiderTradingShares: item.insiderTradingShares
                     }
                 });
-                console.log(`${briefResult.length} were collected.(briefResult.length)`);
+                console.log(`${briefGetData.length} were collected.(briefGetData.length)`);
                 console.log(`${briefInfo.length} was in db. (briefInfo)`);
 
-                // Get All "Sell" Data from New
-                const briefSellResult = briefResult.filter(egg => egg.transcation == 'Sell');
+                console.log(`briefGetData[0]`, briefGetData[0]);
+                console.log(`briefInfo[0]`, briefInfo[0]);
 
-                // Get the specific Data from Sell
-                let allOnboards = Onboard.find({}).exec();
-                let allInterests = Interest.find({}).exec();
-
-                console.log("allOnboards[0]");
-                console.log(allOnboards[0]);
-                
-
-                // Get  * All * "Buy" Data from New Data
-                const briefBuyResult = briefResult.filter(egg => egg.transcation == 'Buy');
-                console.log(`briefBuyResult length: ${briefBuyResult.length}`);
-
-                // Delete the exsists Data from DB at New one.
-                let briefDuplicate = briefBuyResult.slice();
-                briefDuplicate.forEach((item) => {
+                // Deduplication and sort the New one.
+                let dupliBriefGetData = briefGetData.slice();
+                dupliBriefGetData.forEach((item) => {
                     let i = 0;
-                    while(i < briefInfo.length) {
+                    while(i < briefInfo.length){
                         if(JSON.stringify(item) == JSON.stringify(briefInfo[i])) {
-                            //delete
-                            let index = briefBuyResult.indexOf(item);
-                            briefBuyResult.splice(index, 1);
+                            let index = briefGetData.indexOf(item);
+                            briefGetData.splice(index, 1);
+                            break;
+                        }
+                        i++;
+                    }
+                })
+
+                console.log("After deduplication");
+                console.log(`briefGetData[1]`, briefGetData[1]);
+                console.log(`briefGetData.length`, briefGetData.length);
+                // let sort = briefGetData.filter(item => )
+
+                // Get "Buy" Data from New Data
+                const newBuyResult = briefGetData.filter(egg => egg.transaction == 'Buy');
+                console.log(`newBuyResult.length`, newBuyResult.length);
+                console.log(`newBuyResult[0]`, newBuyResult[0]);
+                
+                // Get "Sell" Data from New Data
+                const newSellResult = briefGetData.filter(egg => egg.transaction == 'Sell');
+                console.log(`newSellResult.length`, newSellResult.length);
+                console.log(`newSellResult[1]`, newSellResult[1]);
+
+                // Get "Sell" Data from exsist Data
+                const exsistSellInfo = briefInfo.filter(egg => egg.transaction == 'Sell');
+                console.log(`exsistSellInfo.length`, exsistSellInfo.length);
+                console.log(`exsistSellInfo[0]`, exsistSellInfo[0]);
+
+                // all onboard + interest Data
+                let onboards = await Onboard.find({});
+                let interests = await Interest.find({});
+
+                let exsistOnIns = onboards.concat(interests);
+
+                console.log(`onboards`, onboards);
+                console.log(`interests`, interests);
+
+
+
+                // 새로 들어온 거에서 ticker, company 동일한거 있으면 따로 빼서 저장해줘야함.
+                let important = [];
+                newSellResult.forEach(item => {
+                    let tickercompany = {
+                        ticker: item.ticker,
+                        company: item.company
+                    };
+                    let i = 0;
+                    while(i < exsistOnIns.length) {
+                        let abc = {
+                            ticker: exsistOnIns[i].ticker,
+                            company: exsistOnIns[i].company
+                        };
+                        if(JSON.stringify(abc) === JSON.stringify(tickercompany)) {
+                            important.push(item);
                             break;
                         };
-                        i++;
-                    }     
-                })
-                console.log(`${briefBuyResult.length} is new. (briefBuyResult.length)`);
+                        i++
+                    }
+                });
 
-                let newAddData = briefBuyResult.map((item) => {
-                    let indexNum = briefDuplicate.indexOf(item);
-                    return totalResultObject[indexNum];
+                console.log(`important.length`, important.length);
+                console.log(`important[0]`, important[0]);
+
+                // newBuyResult + important
+                const total = newBuyResult.concat(important);
+
+                let dataResult = total.map(item => {
+                    let index = briefGetData.indexOf(item);
+                    return totalResultObject[index];
                 })
-                return newAddData;
+
+                console.log(`dataResult.length`, dataResult.length);
+
+                return dataResult;
             }
         })
-        .then((newAddData) => {
-            if(newAddData.length > 0) {
-                Info.create(newAddData);
+        .then((dataResult) => {
+            if(dataResult.length > 0) {
+                Info.create(dataResult);
+                console.log("✅ updated executed.");
+            } else {
+                return;
             }
-            console.log("✅ update succeeded");
+            console.log("✅ collection func executed. succeeded");
             return;
         })
     } catch(err) {
@@ -141,7 +191,7 @@ const collectData = async() => {
     }
 }
 
-// collectData();
+collectData();
 
 let getData = async(page, today, pageNum = 1, totalList = []) => {
     try {
@@ -188,7 +238,7 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
         let dateDifference = diffDate(today, lastDataDate);
         console.log(`Date Diff: ${dateDifference}`);
 
-        if(dateDifference < 6) {
+        if(dateDifference < 5) {
             let nextpage = pageNum + 1;
             return await getData(page, today, nextpage, resultArray);
         } else {
@@ -232,3 +282,5 @@ const reformDataType = (date) => {
     day = day >= 10 ? day : '0' + day;
     return year + '-' + month + '-' + day; 
 }
+
+//🔥
