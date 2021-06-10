@@ -3,32 +3,48 @@ import User from "../models/User.js";
 import { pagedArray } from "../utils/pagination.js";
 
 export const postAddOnboard = async (req, res) => {
-    const { onboardList} = req.body;
+    const { onboardList } = req.body;
+    const { filledInOneData } = req.body;
+    console.log(`req.body`, req.body);
     const { _id } = req.user;
 
-    console.log(onboardList);
-
-    // {} => [{}, {}, {}, ... {}]
-    let onboardItems = [];
-    Object.entries(onboardList).forEach(([key, value]) => {
-        // 'num_onboard_key' => num, _, key
-        let splitItem = key.split('_');
-        let num = parseInt(splitItem[0]); // num
-        let itemKey = splitItem[2];  // key
-
-        // Generate {}.
-        if(!onboardItems[`${num}`]) {
-            onboardItems[`${num}`] = {};
-        }
-         
-        // Insert key and value in {}
-        onboardItems[`${num}`][`${itemKey}`] = value;
-    }) 
-    console.log(`onboardItems`, onboardItems);
     
+    let onboardItems = [];
+    if (onboardList) {
+        console.log(`onboardList`, onboardList);
+        // {} => [{}, {}, {}, ... {}]
+        Object.entries(onboardList).forEach(([key, value]) => {
+            // 'num_onboard_key' => num, _, key
+            let splitItem = key.split('_');
+            let num = parseInt(splitItem[0]); // num
+            let itemKey = splitItem[2];  // key
+
+            // Generate {}.
+            if(!onboardItems[`${num}`]) {
+                onboardItems[`${num}`] = {};
+            }
+            
+            // Insert key and value in {}
+            onboardItems[`${num}`][`${itemKey}`] = value;
+        }) 
+    } else if (filledInOneData) {
+        console.log(`filledInOneData`, filledInOneData);
+        onboardItems = filledInOneData;
+    }
+    
+    console.log(`onboardItems`, onboardItems);
+
     // Save in MongoDB
     try {
         let result = await Onboard.create(onboardItems);
+
+        if (!result.length) {
+            console.log("result is object!");
+            result = [result];
+        } 
+        
+        console.log(`result`, result);
+
         let resultDBId = result.map((item) => {
             return item._id
         });

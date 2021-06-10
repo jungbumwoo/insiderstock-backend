@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 
 const onboardSchema = new mongoose.Schema({
-    ticker: String,
-    company: String,
+    ticker: { type: String, required: true },
+    company: { type: String, required: true },
     MarketCap: String,
-    price: String,
-    shares: String,
+    price: { type: String, required: true },
+    shares: { type: String, required: true },
     cost: String,
     date: { type: Date , default: Date.now()},
 });

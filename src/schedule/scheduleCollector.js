@@ -191,7 +191,7 @@ const collectData = async() => {
     }
 }
 
-collectData();
+// collectData();
 
 let getData = async(page, today, pageNum = 1, totalList = []) => {
     try {
@@ -238,7 +238,7 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
         let dateDifference = diffDate(today, lastDataDate);
         console.log(`Date Diff: ${dateDifference}`);
 
-        if(dateDifference < 5) {
+        if(dateDifference < 10) {
             let nextpage = pageNum + 1;
             return await getData(page, today, nextpage, resultArray);
         } else {

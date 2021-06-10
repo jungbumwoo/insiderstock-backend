@@ -18,6 +18,7 @@ export const getAllStock = async(req, res) => {
             await Info.find({ transaction: "Buy"})
             .exec((err, infos) => {
                 // transform for pagination
+                console.log(`infos.length`, infos.length);
                 let paginatedResult = pagedArray(infos, req.query.page);
                 console.log(paginatedResult.pager.currentPage);
                 return res.status(200).json({paginatedResult});
