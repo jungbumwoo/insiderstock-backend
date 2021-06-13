@@ -6,10 +6,10 @@ import Onboard from "../models/Onboard.js";
 
 import { deleteData } from "./deleteScheduler.js";
 
-// schedule.scheduleJob('* 10 * * *', () => {
-//         collectData();
-//         // deleteData();
-// });
+schedule.scheduleJob('* 10 * * *', () => {
+        collectData();
+        // deleteData();
+});
 
 const collectData = async() => {
     console.log('what the what!!');
@@ -109,7 +109,7 @@ const collectData = async() => {
                 })
 
                 console.log("After deduplication");
-                console.log(`briefGetData[1]`, briefGetData[1]);
+                console.log(`briefGetData[0]`, briefGetData[0]);
                 console.log(`briefGetData.length`, briefGetData.length);
                 // let sort = briefGetData.filter(item => )
 
@@ -121,7 +121,7 @@ const collectData = async() => {
                 // Get "Sell" Data from New Data
                 const newSellResult = briefGetData.filter(egg => egg.transaction == 'Sell');
                 console.log(`newSellResult.length`, newSellResult.length);
-                console.log(`newSellResult[1]`, newSellResult[1]);
+                console.log(`newSellResult[0]`, newSellResult[0]);
 
                 // Get "Sell" Data from exsist Data
                 const exsistSellInfo = briefInfo.filter(egg => egg.transaction == 'Sell');
@@ -133,11 +133,6 @@ const collectData = async() => {
                 let interests = await Interest.find({});
 
                 let exsistOnIns = onboards.concat(interests);
-
-                console.log(`onboards`, onboards);
-                console.log(`interests`, interests);
-
-
 
                 // 새로 들어온 거에서 ticker, company 동일한거 있으면 따로 빼서 저장해줘야함.
                 let important = [];
