@@ -21,12 +21,12 @@ export const paginate = (
         endPage = totalPages;
      } else {
         // total pages more than max so calculate start and pages
-        let maxPageBeforeCurrentPage = Math.ceil(maxPages /2) -1;
-        let maxPageAfterCurrentPage = Math.floor(maxPages /2);
-        if (currentPage <= maxPageBeforeCurrentPage) {
+        let maxPageBeforeCurrentPage = Math.ceil(maxPages /2) -1; //4-(1)  5-(2) 6-(2) 7(3) 8(3) 9(4) 10(4)
+        let maxPageAfterCurrentPage = Math.floor(maxPages /2); // 4-(2)  5(2)    6(3)   7(3) 8(4) 9(4) 10(5)
+        if (currentPage <= maxPageBeforeCurrentPage) { 
             startPage = 1;
             endPage = maxPages;
-        } else if (maxPageAfterCurrentPage + currentPage >= maxPages) {
+        } else if (maxPageAfterCurrentPage + currentPage >= totalPages) {
             startPage = totalPages - maxPages + 1;
             endPage = totalPages;
         } else {
@@ -67,7 +67,8 @@ export const pagedArray = (elements: any, query: any) => {
 
     // get pager object for specified pages
     const pageSize = 15;
-    const pager = paginate(items.length, page, pageSize);
+    const max = 5;
+    const pager = paginate(items.length, page, pageSize, max);
 
     // get page of items from items array
     const pageOfItems = items.slice(pager.startIndex, pager.endIndex + 1);
