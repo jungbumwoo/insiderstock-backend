@@ -5,10 +5,10 @@ export const deleteData = async() => {
     try {
         let today = new Date();
         let dateBefore = new Date(today.setDate(today.getDate() - 1));
-        console.log(dateBefore);
+        console.log(`dateBefore`, dateBefore);
         console.log(typeof dateBefore);
 
-        await Info.deleteMany({ transaction: /Sell/, createdAt: {$lte: dateBefore }}, (err, result) => {
+        await Info.deleteMany({ createdAt: {$lte: dateBefore }}, (err, result) => {
             console.log(result);
         });
         // await Info.find({}).exec((err, infos) => {

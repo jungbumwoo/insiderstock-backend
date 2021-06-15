@@ -6,10 +6,10 @@ import Onboard from "../models/Onboard.js";
 
 import { deleteData } from "./deleteScheduler.js";
 
-schedule.scheduleJob('* 10 * * *', () => {
-        collectData();
-        // deleteData();
-});
+// schedule.scheduleJob('* 10 * * *', () => {
+//         collectData();
+//         // deleteData();
+// });
 
 const collectData = async() => {
     console.log('what the what!!');
@@ -133,6 +133,7 @@ const collectData = async() => {
                 let interests = await Interest.find({});
 
                 let exsistOnIns = onboards.concat(interests);
+                console.log(`exsistOnIns.length`, exsistOnIns.length);
 
                 // 새로 들어온 거에서 ticker, company 동일한거 있으면 따로 빼서 저장해줘야함.
                 let important = [];
@@ -161,6 +162,8 @@ const collectData = async() => {
                 // newBuyResult + important
                 const total = newBuyResult.concat(important);
 
+                console.log(`total.length`, total.length);
+
                 let dataResult = total.map(item => {
                     let index = briefGetData.indexOf(item);
                     return totalResultObject[index];
@@ -187,6 +190,7 @@ const collectData = async() => {
 }
 
 // collectData();
+// deleteData();
 
 let getData = async(page, today, pageNum = 1, totalList = []) => {
     try {
@@ -195,18 +199,29 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
             // go to next page
             console.log("if nextpage");
             let changedUrl = '';
-            if(pageNum < 10) {
+            if(pageNum < 7) {
+                console.log(`pageNum`, pageNum);
                 changedUrl = `#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li:nth-child(${pageNum})`;
+                console.log(`changedUrl`, changedUrl);
             } else {
+                console.log(`pageNum`, pageNum);
                 changedUrl = `#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li:nth-child(6)`;
+                console.log(`changedUrl`, changedUrl);
             }
+
+            // await Promise.all([
+            //     page.evaluate(x => {
+            //         return document.querySelector(x).click();
+            //     }, changedUrl),
+            //     page.waitForNavigation()
+            // ])
 
             await page.evaluate(x => {
                 return document.querySelector(x).click();
             }, changedUrl);
             
-            await page.waitForTimeout(2000);
-        };        
+            await page.waitForTimeout(10000);
+        }        
      
         const trTag = '#wrapper > div > table > tbody > tr';
         await page.waitForSelector(trTag);
@@ -216,6 +231,7 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
             let bucket = [];
             trs.forEach(tr => {
                     // bucket.push(tr.innerHTML);
+                    console.log(`tr`, tr);
                     let trTds = tr.querySelectorAll('td');
                     let trBucket = [];
                     trTds.forEach(td => {
@@ -229,7 +245,9 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
             }
         );
         let resultArray = totalList.concat(mainpage);
+        console.log(`mainpage[mainpage.length-1][0]`, mainpage[mainpage.length-1][0]);
         let lastDataDate = mainpage[mainpage.length-1][6];
+        console.log(`lastDataDate`, lastDataDate);
         let dateDifference = diffDate(today, lastDataDate);
         console.log(`Date Diff: ${dateDifference}`);
 

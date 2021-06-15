@@ -28,8 +28,10 @@ export const getAllStock = async(req, res) => {
             let infos = await Info.find({ transaction: "Buy"}).exec();
             console.log("infos at getAllStock! * without * Login");
 
+            let reverseInfos = infos.reverse();
+
             // transform for pagination
-            let paginatedResult = pagedArray(infos, req.query.page);
+            let paginatedResult = pagedArray(reverseInfos, req.query.page);
             console.log(paginatedResult.pager.currentPage);
             return res.status(200).json({paginatedResult});
         }
