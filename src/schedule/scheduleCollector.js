@@ -6,10 +6,11 @@ import Onboard from "../models/Onboard.js";
 
 import { deleteData } from "./deleteScheduler.js";
 
-// schedule.scheduleJob('* 10 * * *', () => {
-//         collectData();
-//         // deleteData();
-// });
+schedule.scheduleJob('0 0 10 * * *', async() => {
+    console.log("executed schedule Func");
+    collectData();
+    deleteData();
+});
 
 const collectData = async() => {
     console.log('what the what!!');

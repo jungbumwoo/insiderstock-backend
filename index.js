@@ -1,7 +1,10 @@
 import cors from "cors";
+import cookie from 'cookie';
+import cookieParser from 'cookie-parser';
 import dotenv from "dotenv";
 import express from "express";
 import passport from "passport";
+import session from 'express-session';
 
 
 //router
@@ -24,6 +27,15 @@ const PORT = process.env.PORT;
 
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
+app.use(session({
+    secret: 'fasdvasd',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { sameSite: "none", secure: true}
+}))
+
+
+// app.use(cookie.parse());
 
 app.use(passport.initialize());
 app.use(passport.session());

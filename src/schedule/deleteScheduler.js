@@ -4,7 +4,7 @@ export const deleteData = async() => {
     console.log("deleteData from deleteScheduler");
     try {
         let today = new Date();
-        let dateBefore = new Date(today.setDate(today.getDate() - 1));
+        let dateBefore = new Date(today.setDate(today.getDate() - 5));
         console.log(`dateBefore`, dateBefore);
         console.log(typeof dateBefore);
 
