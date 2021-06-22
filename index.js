@@ -1,6 +1,4 @@
 import cors from "cors";
-import cookie from 'cookie';
-import cookieParser from 'cookie-parser';
 import dotenv from "dotenv";
 import express from "express";
 import passport from "passport";
