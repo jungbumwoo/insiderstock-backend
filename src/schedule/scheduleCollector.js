@@ -6,11 +6,32 @@ import Onboard from "../models/Onboard.js";
 
 import { deleteData } from "./deleteScheduler.js";
 
+/* For get Data */
 schedule.scheduleJob('0 0 10 * * *', async() => {
-    console.log("executed schedule Func");
+    console.log("executed schedule Func at 10:00 AM");
     collectData();
     deleteData();
 });
+
+schedule.scheduleJob('0 0 23 * * *', async() => {
+    console.log("executed schedule Func at 23:00 PM");
+    collectData();
+    deleteData();
+});
+
+/* Make heroku keep awake */
+schedule.scheduleJob('0 7 * * * *', async() => {
+    console.log("executed schedule Func at 23:00 PM");
+});
+
+schedule.scheduleJob('0 27 * * * *', async() => {
+    console.log("executed schedule Func at 23:00 PM");
+});
+
+schedule.scheduleJob('0 47 * * * *', async() => {
+    console.log("executed schedule Func at 23:00 PM");
+});
+
 
 const collectData = async() => {
     console.log('what the what!!');
