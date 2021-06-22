@@ -14,44 +14,44 @@ passport.deserializeUser(function(info, cb) {
     cb(null, info);
 })
 
-passport.use(new FacebookStrategy({
-    clientID: process.env.FACEBOOK_CLIENT_ID,
-    clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-    callbackURL: process.env.FACEBOOK_CALLBACK_URL
-    },
-    function(accessToken, refreshToken, profile, done) {
-        const { name, id } = profile._json;
-        User.findOne({ id }, async function(err, user) {
-            if (err) { return done(err); }
-            if (user) {
-                console.log("user info/ FacebookStarategy/ passport.js");
-                console.log(user);
-                let info = {
-                    user,
-                    accessToken
-                }
-                done(null, info);
-            } else {
-                user = new User({
-                    id: id,
-                    name: name,
-                    provider: 'facebook'
-                });
-                user.save(function(err) {
-                    if(err){
-                        console.log(err);
-                    } else {
-                        let info = {
-                            user,
-                            accessToken
-                        }
-                        done(null, info);
-                    }
-                })
-            }
-        });
-    },
-))
+// passport.use(new FacebookStrategy({
+//     clientID: process.env.FACEBOOK_CLIENT_ID,
+//     clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+//     callbackURL: process.env.FACEBOOK_CALLBACK_URL
+//     },
+//     function(accessToken, refreshToken, profile, done) {
+//         const { name, id } = profile._json;
+//         User.findOne({ id }, async function(err, user) {
+//             if (err) { return done(err); }
+//             if (user) {
+//                 console.log("user info/ FacebookStarategy/ passport.js");
+//                 console.log(user);
+//                 let info = {
+//                     user,
+//                     accessToken
+//                 }
+//                 done(null, info);
+//             } else {
+//                 user = new User({
+//                     id: id,
+//                     name: name,
+//                     provider: 'facebook'
+//                 });
+//                 user.save(function(err) {
+//                     if(err){
+//                         console.log(err);
+//                     } else {
+//                         let info = {
+//                             user,
+//                             accessToken
+//                         }
+//                         done(null, info);
+//                     }
+//                 })
+//             }
+//         });
+//     },
+// ))
 
 passport.use(new KakaoStrategy({
     clientID: process.env.KAKAO_REST_CLIENTID,
