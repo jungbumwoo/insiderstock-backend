@@ -7,29 +7,34 @@ import Onboard from "../models/Onboard.js";
 import { deleteData } from "./deleteScheduler.js";
 
 /* For get Data */
-schedule.scheduleJob('0 0 10 * * *', async() => {
-    console.log("executed schedule Func at 10:00 AM");
+const rule = new schedule.RecurrenceRule();
+rule.hour = [ 8, 17, 22 ];
+rule.tz = 'Asia/Seoul';
+
+schedule.scheduleJob(rule, async() => {
+    console.log("✅ executed Collect schedule Func");
     collectData();
     deleteData();
 });
 
-schedule.scheduleJob('0 0 23 * * *', async() => {
-    console.log("executed schedule Func at 23:00 PM");
-    collectData();
-    deleteData();
-});
+// schedule.scheduleJob('0 0 23 * * *', async() => {
+//     console.log("✅ executed schedule Func at 23:00 PM");
+//     collectData();
+//     deleteData();
+// });
 
 /* Make heroku keep awake */
-schedule.scheduleJob('0 7 * * * *', async() => {
-    console.log("executed schedule Func at 23:00 PM");
-});
+// schedule.scheduleJob('0 9 * * * *', async() => {
+//     console.log(" ☑ executed schedule Func at --:07:00");
+// });
 
-schedule.scheduleJob('0 27 * * * *', async() => {
-    console.log("executed schedule Func at 23:00 PM");
-});
+const ruleForAwake = new schedule.RecurrenceRule();
+ruleForAwake.hour = [ 0, 1, new schedule.Range(7, 23)];
+ruleForAwake.minute = [9, 29, 49];
+ruleForAwake.tz = 'Asia/Seoul';
 
-schedule.scheduleJob('0 47 * * * *', async() => {
-    console.log("executed schedule Func at 23:00 PM");
+schedule.scheduleJob(ruleForAwake, async() => {
+    console.log(" ☑ ✔ Awake Func executed");
 });
 
 
@@ -191,7 +196,7 @@ const collectData = async() => {
                     return totalResultObject[index];
                 })
 
-                console.log(`dataResult.length`, dataResult.length);
+                console.log(`✔️ dataResult.length`, dataResult.length);
 
                 return dataResult;
             }
@@ -207,7 +212,9 @@ const collectData = async() => {
             return;
         })
     } catch(err) {
+        console.log("❌");
         console.log(err);
+        return;
     }
 }
 
@@ -221,7 +228,7 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
             // go to next page
             console.log("if nextpage");
             let changedUrl = '';
-            if(pageNum < 7) {
+            if(pageNum < 10) {
                 console.log(`pageNum`, pageNum);
                 changedUrl = `#components-root > div > div.insider-page > div.aio-tabs.hide-on-print.hidden-sm-and-down > div.el-pagination.el-pagination--small > ul > li:nth-child(${pageNum})`;
                 console.log(`changedUrl`, changedUrl);
@@ -280,7 +287,9 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
             return resultArray;
         }
     } catch(err) {
+        console.log("❌");
         console.log(err);
+        return;
     }
     // date caculate and return or recursive
 };
