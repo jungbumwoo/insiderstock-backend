@@ -20,9 +20,6 @@ import "./src/schedule/scheduleCollector.js";
 const app = express();
 const PORT = process.env.PORT;
 
-// express.json();
-// express.urlencoded({ extended: true })
-
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
@@ -31,9 +28,6 @@ app.use(session({
     saveUninitialized: true,
     cookie: { sameSite: "none", secure: true}
 }))
-
-
-// app.use(cookie.parse());
 
 app.use(passport.initialize());
 app.use(passport.session());
