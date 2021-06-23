@@ -4,7 +4,6 @@ import express from "express";
 import passport from "passport";
 import session from 'express-session';
 
-
 //router
 import stockRouter from "./src/routers/stockRouter.js";
 import userRouter from "./src/routers/userRouter.js";

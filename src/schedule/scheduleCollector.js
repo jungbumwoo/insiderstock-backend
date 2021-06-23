@@ -1,5 +1,7 @@
 import puppeteer from "puppeteer";
 import schedule from "node-schedule";
+import https from "https";
+
 import Info from "../models/Info.js";
 import Interest from "../models/Interest.js";
 import Onboard from "../models/Onboard.js";
@@ -12,31 +14,35 @@ rule.hour = [ 8, 17, 22 ];
 rule.tz = 'Asia/Seoul';
 
 schedule.scheduleJob(rule, async() => {
-    console.log("✅ executed Collect schedule Func");
-    collectData();
-    deleteData();
+    try {
+        console.log("✅ executed Collect schedule Func");
+        collectData();
+        deleteData();
+    } catch(err) {
+        console.log(err);
+    }
 });
-
-// schedule.scheduleJob('0 0 23 * * *', async() => {
-//     console.log("✅ executed schedule Func at 23:00 PM");
-//     collectData();
-//     deleteData();
-// });
-
-/* Make heroku keep awake */
-// schedule.scheduleJob('0 9 * * * *', async() => {
-//     console.log(" ☑ executed schedule Func at --:07:00");
-// });
 
 const ruleForAwake = new schedule.RecurrenceRule();
 ruleForAwake.hour = [ 0, 1, new schedule.Range(7, 23)];
 ruleForAwake.minute = [9, 29, 49];
 ruleForAwake.tz = 'Asia/Seoul';
 
-schedule.scheduleJob(ruleForAwake, async() => {
+schedule.scheduleJob(ruleForAwake, () => {
     try {
         console.log(" ☑ ✔ Awake Func executed");
-        http.get("https://limitless-island-44318.herokuapp.com/api/stock");
+        const httpOption = {
+            hostname: "https://limitless-island-44318.herokuapp.com/",
+            path: "/api/stock",
+            method: 'GET'
+        }
+        const req = https.request(httpOption, res => {
+            console.log(`statusCode: ${statusCode}`);
+        })
+        req.on('error', error=> {
+            console.error(error)
+        })
+        req.end()
     } catch(err) {
         console.log(err);
     }
