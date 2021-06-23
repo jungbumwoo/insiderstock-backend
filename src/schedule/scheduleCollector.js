@@ -34,8 +34,12 @@ ruleForAwake.minute = [9, 29, 49];
 ruleForAwake.tz = 'Asia/Seoul';
 
 schedule.scheduleJob(ruleForAwake, async() => {
-    console.log(" ☑ ✔ Awake Func executed");
-    http.get("https://limitless-island-44318.herokuapp.com/api/stock");
+    try {
+        console.log(" ☑ ✔ Awake Func executed");
+        http.get("https://limitless-island-44318.herokuapp.com/api/stock");
+    } catch(err) {
+        console.log(err);
+    }
 });
 
 
