@@ -32,12 +32,12 @@ schedule.scheduleJob(ruleForAwake, () => {
     try {
         console.log(" ☑ ✔ Awake Func executed");
         const httpOption = {
-            hostname: "https://limitless-island-44318.herokuapp.com/",
+            hostname: "limitless-island-44318.herokuapp.com",
             path: "/api/stock",
             method: 'GET'
         }
         const req = https.request(httpOption, res => {
-            console.log(`statusCode: ${statusCode}`);
+            console.log(`res.statusCode: ${res.statusCode}`);
         })
         req.on('error', error=> {
             console.error(error)
@@ -47,7 +47,6 @@ schedule.scheduleJob(ruleForAwake, () => {
         console.log(err);
     }
 });
-
 
 const collectData = async() => {
     console.log('what the what!!');
