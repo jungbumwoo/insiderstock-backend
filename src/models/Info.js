@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 
 const infoSchema = new mongoose.Schema({
-    ticker: String,
-    company: String,
+    ticker: { type: String, required: true},
+    company: { type: String, required: true}, 
     insiderName: String,
     insiderPosition: String,
-    date: { type: Date },
-    transaction: String,
+    date: { type: Date, required: true },
+    transaction: { type: String, required: true},
     insiderTradingShares: String,
     sharesChange: String,
     purchasePrice: String,

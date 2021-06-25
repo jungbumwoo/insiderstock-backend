@@ -4,12 +4,13 @@ export const deleteData = async() => {
     console.log("deleteData from deleteScheduler");
     try {
         let today = new Date();
-        let dateBefore = new Date(today.setDate(today.getDate() - 5));
+        let dateBefore = new Date(today.setDate(today.getDate() - 8));
         console.log(`dateBefore`, dateBefore);
         console.log(typeof dateBefore);
 
         await Info.deleteMany({ createdAt: {$lte: dateBefore }}, (err, result) => {
             console.log(result);
+            console.log(`✅ Delete func Done.`)
         });
         // await Info.find({}).exec((err, infos) => {
         //     let getDateDiff = (infoDate) => {

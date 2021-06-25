@@ -16,8 +16,8 @@ rule.tz = 'Asia/Seoul';
 schedule.scheduleJob(rule, async() => {
     try {
         console.log("✅ executed Collect schedule Func");
-        collectData();
-        deleteData();
+        await collectData();
+        await deleteData();
     } catch(err) {
         console.log(err);
     }
@@ -114,6 +114,9 @@ const collectData = async() => {
             if(info){
                 //  reform for compare with New Data.
                 let briefInfo = info.map((item) => {
+                    if(!item.date) {
+                        console.log(item);
+                    }
                     let reformDate = reformDataType(item.date);
                     return {
                         ticker: item.ticker,
@@ -128,9 +131,6 @@ const collectData = async() => {
                 console.log(`${briefGetData.length} were collected.(briefGetData.length)`);
                 console.log(`${briefInfo.length} was in db. (briefInfo)`);
 
-                console.log(`briefGetData[0]`, briefGetData[0]);
-                console.log(`briefInfo[0]`, briefInfo[0]);
-
                 // Deduplication and sort the New one.
                 let dupliBriefGetData = briefGetData.slice();
                 dupliBriefGetData.forEach((item) => {
@@ -139,6 +139,7 @@ const collectData = async() => {
                         if(JSON.stringify(item) == JSON.stringify(briefInfo[i])) {
                             let index = briefGetData.indexOf(item);
                             briefGetData.splice(index, 1);
+                            totalResultObject.splice(index, 1);
                             break;
                         }
                         i++;
@@ -146,24 +147,19 @@ const collectData = async() => {
                 })
 
                 console.log("After deduplication");
-                console.log(`briefGetData[0]`, briefGetData[0]);
                 console.log(`briefGetData.length`, briefGetData.length);
-                // let sort = briefGetData.filter(item => )
 
                 // Get "Buy" Data from New Data
                 const newBuyResult = briefGetData.filter(egg => egg.transaction == 'Buy');
                 console.log(`newBuyResult.length`, newBuyResult.length);
-                console.log(`newBuyResult[0]`, newBuyResult[0]);
                 
                 // Get "Sell" Data from New Data
                 const newSellResult = briefGetData.filter(egg => egg.transaction == 'Sell');
                 console.log(`newSellResult.length`, newSellResult.length);
-                console.log(`newSellResult[0]`, newSellResult[0]);
 
                 // Get "Sell" Data from exsist Data
                 const exsistSellInfo = briefInfo.filter(egg => egg.transaction == 'Sell');
                 console.log(`exsistSellInfo.length`, exsistSellInfo.length);
-                console.log(`exsistSellInfo[0]`, exsistSellInfo[0]);
 
                 // all onboard + interest Data
                 let onboards = await Onboard.find({});
@@ -198,13 +194,30 @@ const collectData = async() => {
 
                 // newBuyResult + important
                 const total = newBuyResult.concat(important);
-
                 console.log(`total.length`, total.length);
 
-                let dataResult = total.map(item => {
+                // get whole data
+                let wholeResult = total.map(item => {
                     let index = briefGetData.indexOf(item);
+                    // console.log(`item`, item);
+                    // console.log(`briefGetData[${index}]`, briefGetData[index]);
+                    // console.log(`totalResultObject[${index}]`, totalResultObject[index]);
                     return totalResultObject[index];
                 })
+
+                // remove Duplicate
+                const uniq = new Set(wholeResult.map(e => JSON.stringify(e)));
+                const uniqResult = Array.from(uniq).map(e => JSON.parse(e)); 
+
+                if(wholeResult.length !== uniqResult.length) {
+                    console.log(`wholeResult.length`, wholeResult.length);
+                    console.log(`uniqResult.length`, uniqResult.length);
+                    console.log("⚠️  seems wholeResult has duplicate data. migth be problems in Scrolling Data");
+                }
+
+                // reverse order for latest data come up
+                // Careful: reverse is destructive -- it changes the original array.
+                const dataResult = uniqResult.reverse();
 
                 console.log(`✔️ dataResult.length`, dataResult.length);
 
@@ -213,8 +226,11 @@ const collectData = async() => {
         })
         .then((dataResult) => {
             if(dataResult.length > 0) {
-                Info.create(dataResult);
-                console.log("✅ updated executed.");
+                Info.create(dataResult, (error, result) => {
+                    console.log("scrolling result");
+                    console.log(result);
+                });
+                console.log("✅ updated executed. getData func Done.");
             } else {
                 return;
             }
@@ -228,8 +244,8 @@ const collectData = async() => {
     }
 }
 
-// collectData();
-// deleteData();
+collectData();
+
 
 let getData = async(page, today, pageNum = 1, totalList = []) => {
     try {
