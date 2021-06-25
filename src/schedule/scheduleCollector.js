@@ -11,6 +11,7 @@ import { deleteData } from "./deleteScheduler.js";
 /* For get Data */
 const rule = new schedule.RecurrenceRule();
 rule.hour = [ 8, 17, 22 ];
+rule.minute = 0;
 rule.tz = 'Asia/Seoul';
 
 schedule.scheduleJob(rule, async() => {
@@ -245,9 +246,6 @@ const collectData = async() => {
         return;
     }
 }
-
-collectData();
-deleteData();
 
 let getData = async(page, today, pageNum = 1, totalList = []) => {
     try {

@@ -1,35 +1,15 @@
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 
-export const getLogin = (req, res) => {
-    console.log("getLogin");
-}
-
-export const getUser = (req, res) => {
-    
-}
-
-export const postLogin = (req, res) => {
-    console.log("postLogin");
-}
-
-// signin or signup 에 따라 token이 전달되는 obj가 다른듯.
-export const getTokenFacebook = (req, res, next) => {
-    if(true) {
-        // signin
-        const { accessToken, user } = req.session.passport.user;
-        res.cookie('userName', user.name, { expiresIn: '1d'});
-        // res.clearCookie('token');
-        return res.redirect(`http://localhost:3000/${accessToken}/#`);
-    } else {
-        //signup
-        // const token = req.authInfo;
-    }
-}
-
 export const getToken = (req, res) => {
+    console.log(`getToken accepted`);
     return res.status(200).json({"getTokenResult": "muyaho"});
 };
+
+export const kakaoLoginCallback = (req, res) => {
+    console.log("kakaologincallback");
+    console.log(`req.user`, req.user);
+}
 
 export const signout = (req, res, next) => {
     console.log('singout at usercontroller');

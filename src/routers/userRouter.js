@@ -7,23 +7,24 @@ import { getLogin,
     getUser, 
     signout, 
     postKakaoJsSignin,
-    postKakaoJsSignup
+    postKakaoJsSignup,
+    kakaoLoginCallback
  } from "../controllers/userController.js";
 const router = express.Router();
 
-router.get('/login', getLogin);
-router.get('/auth/facebook', passport.authenticate('facebook'));
-router.get('/auth/facebook/callback',
-    passport.authenticate('facebook', { failureRedirect: '/login'}),
-    getTokenFacebook
-);
+// router.get('/auth/facebook', passport.authenticate('facebook'));
+// router.get('/auth/facebook/callback',
+//     passport.authenticate('facebook', { failureRedirect: '/login'}),
+//     getTokenFacebook
+// );
 
 router.get('/oauth', passport.authenticate('kakao', {
-    failureRedirect: '/login'
+    failureRedirect: '/signin'
 }), getToken);
 
-
-router.get('/auth/getuser', getUser);
+router.get('/oauth/kakao/callback', passport.authenticate('kakao', {
+    failureRedirect: '/signin'
+}), kakaoLoginCallback);
 
 router.post('/auth/kakao/jslogin', postKakaoJsSignin);
 router.post('/auth/kakao/signup', postKakaoJsSignup);
