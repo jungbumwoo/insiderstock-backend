@@ -244,9 +244,6 @@ const collectData = async() => {
     }
 }
 
-collectData();
-
-
 let getData = async(page, today, pageNum = 1, totalList = []) => {
     try {
         console.log(`getData Func page: ${page}, today: ${today}, pageNum: ${pageNum}`);
