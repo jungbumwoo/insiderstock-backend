@@ -52,7 +52,9 @@ const collectData = async() => {
     console.log('what the what!!');
     try {
         console.log("getAllStock Func executed");
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
         const page = await browser.newPage();
         await page.goto('https://www.gurufocus.com/forum/login.php?0');
         
@@ -238,11 +240,14 @@ const collectData = async() => {
             return;
         })
     } catch(err) {
-        console.log("❌");
+        console.log("❌ Err at collectData Func");
         console.log(err);
         return;
     }
 }
+
+collectData();
+deleteData();
 
 let getData = async(page, today, pageNum = 1, totalList = []) => {
     try {
@@ -310,7 +315,7 @@ let getData = async(page, today, pageNum = 1, totalList = []) => {
             return resultArray;
         }
     } catch(err) {
-        console.log("❌");
+        console.log("❌ Err at getData Func");
         console.log(err);
         return;
     }
