@@ -8,7 +8,8 @@ export const getToken = (req, res) => {
 
 export const kakaoLoginCallback = (req, res) => {
     console.log("kakaologincallback");
-    console.log(`req.user`, req.user);
+    console.log(`req.user`, req.uesr);
+    // console.log(`req.user`, req.user);
 }
 
 export const signout = (req, res, next) => {

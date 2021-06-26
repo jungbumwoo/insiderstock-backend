@@ -18,13 +18,13 @@ const router = express.Router();
 //     getTokenFacebook
 // );
 
-router.get('/oauth', passport.authenticate('kakao', {
+router.get('/login/kakao', passport.authenticate('kakao', {
     failureRedirect: '/signin'
 }), getToken);
 
 router.get('/oauth/kakao/callback', passport.authenticate('kakao', {
     failureRedirect: '/signin'
-}), kakaoLoginCallback);
+}));
 
 router.post('/auth/kakao/jslogin', postKakaoJsSignin);
 router.post('/auth/kakao/signup', postKakaoJsSignup);

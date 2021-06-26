@@ -3,6 +3,8 @@ import FacebookStrategy from "passport-facebook";
 import KakaoStrategy from "passport-kakao";
 import User from "./models/User.js";
 
+import jwt from "jsonwebtoken";
+
 passport.serializeUser(function(info, cb) {
     console.log("serializeUser is executed");
     console.log(info);
@@ -77,7 +79,12 @@ passport.use(new KakaoStrategy({
                     return done(err, user)
                 })
             } else {
-                return done(err, user);
+                const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+                return res.status(200).json({
+                    token, 
+                    name: user.name
+                })
+                // return done(err, user);
             }
         })
     }
