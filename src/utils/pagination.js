@@ -61,7 +61,7 @@ const pagedArray = (elements, query) => {
     // get page from query or default to first page
     const page = parseInt(query) || 1;
     // get pager object for specified pages
-    const pageSize = 15;
+    const pageSize = 10;
     const max = 5;
     const pager = exports.paginate(items.length, page, pageSize, max);
     // get page of items from items array

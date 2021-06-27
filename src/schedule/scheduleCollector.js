@@ -230,8 +230,11 @@ const collectData = async() => {
         .then((dataResult) => {
             if(dataResult.length > 0) {
                 Info.create(dataResult, (error, result) => {
-                    console.log("scrolling result");
-                    console.log(result);
+                    if(err) {
+                        console.log(err);
+                    }
+                    // console.log("scrolling result");
+                    // console.log(result);
                 });
                 console.log("✅ updated executed. getData func Done.");
             } else {

@@ -12,19 +12,20 @@ import { getLogin,
  } from "../controllers/userController.js";
 const router = express.Router();
 
-// router.get('/auth/facebook', passport.authenticate('facebook'));
-// router.get('/auth/facebook/callback',
-//     passport.authenticate('facebook', { failureRedirect: '/login'}),
-//     getTokenFacebook
-// );
+router.get('/auth/facebook', passport.authenticate('facebook'));
+router.get('/auth/facebook/callback',
+    passport.authenticate('facebook', { failureRedirect: '/login'}),
+    getTokenFacebook
+);
 
 router.get('/login/kakao', passport.authenticate('kakao', {
     failureRedirect: '/signin'
 }), getToken);
 
-router.get('/oauth/kakao/callback', passport.authenticate('kakao', {
-    failureRedirect: '/signin'
-}));
+router.get('/oauth/kakao/callback',
+    passport.authenticate('kakao', { failureRedirect: '/signin'}),
+    kakaoLoginCallback
+);
 
 router.post('/auth/kakao/jslogin', postKakaoJsSignin);
 router.post('/auth/kakao/signup', postKakaoJsSignup);

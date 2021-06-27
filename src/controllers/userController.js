@@ -8,7 +8,8 @@ export const getToken = (req, res) => {
 
 export const kakaoLoginCallback = (req, res) => {
     console.log("kakaologincallback");
-    console.log(`req.user`, req.uesr);
+    const token = jwt.sign({ _id: req.user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    return res.status(200).json({ username: req.user.name, token});
     // console.log(`req.user`, req.user);
 }
 
@@ -68,4 +69,9 @@ export const postKakaoJsSignin = (req, res) => {
             })
         }
     })
+}
+
+export const getTokenFacebook = (req, res) => {
+    console.log("getTokenFacebook");
+    console.log(`req`, req);
 }

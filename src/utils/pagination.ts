@@ -66,7 +66,7 @@ export const pagedArray = (elements: any, query: any) => {
     const page = parseInt(query) || 1;
 
     // get pager object for specified pages
-    const pageSize = 15;
+    const pageSize = 10;
     const max = 5;
     const pager = paginate(items.length, page, pageSize, max);
 
