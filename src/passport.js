@@ -7,7 +7,6 @@ import jwt from "jsonwebtoken";
 
 passport.serializeUser(function(info, cb) {
     console.log("serializeUser is executed");
-    console.log(info);
     cb(null, info);
 })
 

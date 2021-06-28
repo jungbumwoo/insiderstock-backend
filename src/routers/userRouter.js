@@ -1,5 +1,6 @@
 import express from "express";
 import passport from "passport";
+import { requireSignin } from "../middlewares";
 import { getLogin, 
     postLogin, 
     getToken, 
@@ -8,7 +9,8 @@ import { getLogin,
     signout, 
     postKakaoJsSignin,
     postKakaoJsSignup,
-    kakaoLoginCallback
+    kakaoLoginCallback,
+    handleToken
  } from "../controllers/userController.js";
 const router = express.Router();
 
@@ -29,6 +31,8 @@ router.get('/oauth/kakao/callback',
 
 router.post('/auth/kakao/jslogin', postKakaoJsSignin);
 router.post('/auth/kakao/signup', postKakaoJsSignup);
+
+router.post('/auth/token', handleToken);
 
 router.get('/auth/signout', signout);
     // { successRedirect: 'http://localhost:3000',

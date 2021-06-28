@@ -8,9 +8,10 @@ export const getToken = (req, res) => {
 
 export const kakaoLoginCallback = (req, res) => {
     console.log("kakaologincallback");
-    const token = jwt.sign({ _id: req.user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    return res.status(200).json({ username: req.user.name, token});
-    // console.log(`req.user`, req.user);
+    console.log(`req.user`, req.user);
+    const token = jwt.sign({ _id: req.user._id, username: req.user.name }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    return res.redirect(`http://localhost:3000/token/${token}`);
+    // return res.status(200).json({ username: req.user.name, token});
 }
 
 export const signout = (req, res, next) => {
@@ -74,4 +75,10 @@ export const postKakaoJsSignin = (req, res) => {
 export const getTokenFacebook = (req, res) => {
     console.log("getTokenFacebook");
     console.log(`req`, req);
+}
+
+export const handleToken = async(req, res) => {
+    const token = req.body.token;
+    const user = await jwt.verify(token, process.env.JWT_SECRET);
+    return res.status(200).json({ username : user.username });
 }

@@ -8,7 +8,7 @@ export const requireSignin = async(req, res, next) => {
             console.log("✅ user logged In");
             req.user = user;
         } else {
-            return res.status(400).json({"message" : "Need to Login for this content"})
+            console.log("header doesn't have token");
         }
     } catch(err) {
         console.log(err);
