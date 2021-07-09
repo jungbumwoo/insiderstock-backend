@@ -1,6 +1,5 @@
 import User from "../models/User.js";
 import Interest from "../models/Interest.js";
-import Notinterest from "../models/Notinterest.js";
 import Info from "../models/Info.js";
 import jwt from "jsonwebtoken";
 

@@ -80,6 +80,7 @@ export const getOnboard = (req, res) => {
         .exec((err, user) => {
             if(err) return res.status(400).json({ "message" : "Error!!"})
             if(user) {
+                console.log(`req.query.page`, req.query.page);
                 let onboardList = user.onboards;
                 let pagedOnboard = pagedArray(onboardList, req.query.page);
                 return res.status(200).json({ pagedOnboard });
