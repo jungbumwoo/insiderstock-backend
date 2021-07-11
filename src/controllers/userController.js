@@ -1,5 +1,8 @@
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const getToken = (req, res) => {
     console.log(`getToken accepted`);
@@ -10,7 +13,8 @@ export const kakaoLoginCallback = (req, res) => {
     console.log("kakaologincallback");
     console.log(`req.user`, req.user);
     const token = jwt.sign({ _id: req.user._id, username: req.user.name }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    return res.redirect(`http://localhost:3000/token/${token}`);
+    return res.redirect(`${process.env.NETLIFY}token/${token}`);
+    // return res.redirect(`http://localhost:3000/token/${token}`);
     // return res.status(200).json({ username: req.user.name, token});
 }
 
