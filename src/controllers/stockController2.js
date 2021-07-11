@@ -4,6 +4,7 @@ import Info from "../models/Info.js";
 import jwt from "jsonwebtoken";
 
 import { pagedArray } from "../utils/pagination.js";
+import { filterData } from "../utils/datafilter.js";
 
 // 첫 페이지 뜨는 거 읽은 다음에 다음 페이지는 상황을 봐가며 읽던가 멈추던가 하는 방법이 있고
 // 아에 처음부터 페이지를 돌리는데 상황을 보고 멈추는 방법도 있고.
@@ -15,11 +16,20 @@ export const getAllStock = async(req, res) => {
             let token = req.headers.authorization.split(" ")[1];
             const user = await jwt.verify(token, process.env.JWT_SECRET);
             await Info.find({ transaction: "Buy"})
-            .exec((err, infos) => {
-                // transform for pagination
-                console.log(`infos.length`, infos.length);
-                let paginatedResult = pagedArray(infos, req.query.page);
-                console.log(paginatedResult.pager.currentPage);
+            .exec(async(err, infos) => {
+
+                let sellInfos = await Info.find({ transaction: "Sell"});
+                console.log(`sellInfos.length`, sellInfos.length);
+                let personalStockData = await User.findOne({ _id :user._id }).
+                    populate({ path: 'onboards', select: ['ticker', 'company'] }).
+                    populate({ path: 'interests', select: ['ticker', 'company'] }).
+                    populate({ path: 'bans', select: ['ticker', 'company'] }).
+                    populate({ path: 'notinterests', select: ['ticker', 'company'] })
+                
+
+                let filteredResult = await filterData(infos, sellInfos, personalStockData);
+              
+                let paginatedResult = pagedArray(filteredResult, req.query.page);
                 return res.status(200).json({paginatedResult});
             })
         } else {

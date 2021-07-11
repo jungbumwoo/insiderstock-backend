@@ -24,6 +24,8 @@ schedule.scheduleJob(rule, async() => {
     }
 });
 
+// for Heroku keep awake 
+
 const ruleForAwake = new schedule.RecurrenceRule();
 ruleForAwake.hour = [ 0, 1, new schedule.Range(7, 23)];
 ruleForAwake.minute = [9, 29, 49];
@@ -48,6 +50,23 @@ schedule.scheduleJob(ruleForAwake, () => {
         console.log(err);
     }
 });
+
+/* Delete Data */
+const deleteRule = new schedule.RecurrenceRule();
+deleteRule.hour = 8;
+deleteRule.minute = 20;
+deleteRule.tz = 'Asia/Seoul';
+
+schedule.scheduleJob(rule, async() => {
+    try {
+        console.log("❌ executed Delete schedule Func");
+        await deleteData();
+    } catch(err) {
+        console.log(err);
+    }
+});
+
+
 
 const collectData = async() => {
     console.log('what the what!!');
