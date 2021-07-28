@@ -29,6 +29,11 @@ router.get('/oauth/kakao/callback',
     kakaoLoginCallback
 );
 
+router.get('/oauth/kakao/:code',
+    passport.authenticate('kakao', { failureRedirect: '/signin'}),
+    kakaoLoginCallback
+);
+
 router.post('/auth/kakao/jslogin', postKakaoJsSignin);
 router.post('/auth/kakao/signup', postKakaoJsSignup);
 
