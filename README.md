@@ -30,6 +30,7 @@ schedule.scheduleJob(rule, async() => {
 });
 ```
 
+---
 
 ### api
 
@@ -45,8 +46,6 @@ schedule.scheduleJob(rule, async() => {
 - GET `/getnotinterest?page=${params}` :  유저의 관심없는 주식 항목을 페이지 단위로 조회함
 - PUT `/addnotinterest` : 해당 주식을 유저의 무관심 항목에 추가함. 이후 해당 주식은 해당 유저에게서 1주일 간 조회되지 않음 
 - PUT `/delete/notinterest` : 해당 주식을 유저의 무관심 항목에서 삭제함
-
-- GET `/ban?page=${params}` : 
 
 - GET `/addban` : 해당 주식을 유저의 차단 항목에 추가함. 이후 해당 주식은 해당 유저의 내부자 거래 목록에서 조회되지 않음
 - GET `/ban?page=${params}` :  유저가 차단한 주식 항목을 페이지 단위로 조회함
@@ -65,7 +64,8 @@ schedule.scheduleJob(rule, async() => {
 - 수익률 악화 - 본 웹을 이용하여 10여건의 투자를 집행했으나 약 1년간 지속적으로 수익률이 악화되며 약 -70% 의 수익률..
 
 - 의존성 : 서비스가 Guru Focus(https://www.gurufocus.com/) 의 데이터를 크롤링 해와서 운영된다. 로그인 - 탭 이동 - 팝업 창 닫기 - 페이지 순회하기 의 과정을 거쳐서 데이터를 스크롤링을 하게 되는데,
-GuruFocus에서 DOM에 변경사항을 주거나, 로그인 이후 팝업창을 띄우는지 안띄우는지의 여부 등 Guru Focus에 의존성이 너무 높다.
+GuruFocus에서 DOM에 변경사항을 주거나, 로그인 이후 팝업창을 띄우는지 안띄우는지의 여부 등 Guru Focus에 의존성이 너무 높다. Guru 에서 프로모션을 하거나 조금만 변경사항이 생기면
+같이 업데이트를 해줘야함..
 
 ``` javascript
 await page.goto('https://www.gurufocus.com/forum/login.php?0');
